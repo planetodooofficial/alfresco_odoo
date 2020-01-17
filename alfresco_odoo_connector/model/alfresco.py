@@ -48,7 +48,7 @@ class AlfrescoOperations(models.TransientModel):
                 self.alf_encoded_ticket = auth_token
 
         except Exception as e:
-            _logger.error('Bad Request %s', e)
+            raise e
 
     def get_repository_info(self):
 
