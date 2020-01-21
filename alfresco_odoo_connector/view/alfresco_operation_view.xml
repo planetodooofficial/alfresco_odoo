@@ -1,4 +1,7 @@
 <odoo>
+
+    <!-- Authentication   -->
+
     <record id="alfresco_operations_id" model="ir.actions.act_window">
         <field name="name">Operations</field>
         <field name="res_model">alfresco.operations</field>
@@ -48,9 +51,11 @@
     <menuitem id="alf_operations"
               name="Alfresco API"
               groups="base.group_user"/>
+
     <menuitem id="alf_auth_ticket_id"
               parent="alf_operations"
               name="Authentication"
               groups="base.group_user"
               action="alfresco_operations_id"/>
+
 </odoo>

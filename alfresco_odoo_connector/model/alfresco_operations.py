@@ -8,11 +8,7 @@ import json
 _logger = logging.getLogger(__name__)
 
 
-class AlfrescoOperations(models.TransientModel):
-
-    """This class contains the functions for Authentication
-    & Getting the repository information from Alfresco"""
-
+class AlfrescoOperations(models.Model):
     _name = 'alfresco.operations'
     _rec_name = 'alf_username'
 
@@ -24,7 +20,7 @@ class AlfrescoOperations(models.TransientModel):
     def get_auth_token_header(self):
 
         """Function for Authenticating with the Repository to get a TICKET
-        and generate TOKEN which will be use for other API calls."""
+        and generate TOKEN which will be use for other API calls"""
 
         datas = {
             "userId": str(self.alf_username),
@@ -63,6 +59,28 @@ class AlfrescoOperations(models.TransientModel):
 
         response = requests.get(repo_url, headers=token_headers)
         if response.status_code == 200:
-            raise ValidationError("Successful!")
+            wiz_ob = self.env['pop.messages'].create({'popup_text': 'Successful.'})
+            return {
+                'name': _('Repository Information'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.messages',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
         else:
-            raise ValidationError("Bad Response")
+            wiz_ob1 = self.env['pop.messages'].create({'popup_text': 'Bad Response.'})
+            return {
+                'name': _('Repository Information'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.messages',
+                'res_id': wiz_ob1.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
