@@ -1,0 +1,16 @@
+<odoo>
+    <record id="pop_up_wizard_view" model="ir.ui.view">
+        <field name="name">pop.messages</field>
+        <field name="model">pop.messages</field>
+        <field name="arch" type="xml">
+            <form string="Email Alert">
+                <group>
+                    <field name="popup_text" nolabel="1"/>
+                </group>
+                <footer>
+                    <button special="cancel" string="OK" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

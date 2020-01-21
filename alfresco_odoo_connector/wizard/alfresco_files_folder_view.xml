@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="files_folder_form_id" model="ir.ui.view">
+            <field name="name">files.folder.id</field>
+            <field name="model">alfresco.files.folder</field>
+            <field name="arch" type="xml">
+                <form string="Create Folder">
+                    <group>
+                        <group>
+                            <field name="alf_folder_name"/>
+                            <field name="alf_folder_title"/>
+                            <field name="alf_folder_desc"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="create_folder" string="Create" type="object" class="oe_highlight"/>
+                        <button name="list_contents_for_folders" string="List Content" type="object" class="oe_highlight"/>
+                        <button name="filer_contents_of_folder" string="Filter Content" type="object" class="oe_highlight"/>
+                        <button name="get_folder_file_metadata" string="Get Metadata" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_files_folder" model="ir.actions.act_window">
+            <field name="name">Create Folder</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alfresco.files.folder</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="files_folder_form_id"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_file_folder" name="Files &amp; Folder" parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
+        <menuitem id="sub_menu_create_folder" name="Create Folder" action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder"/>
+
+    </data>
+</odoo>
