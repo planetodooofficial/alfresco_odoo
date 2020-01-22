@@ -5,6 +5,7 @@ from odoo.exceptions import UserError, ValidationError
 import logging
 import requests
 import json
+import os
 
 _logger = logging.getLogger(__name__)
 
@@ -89,7 +90,8 @@ class Manage_Files_Folders(models.TransientModel):
         response = requests.get(base_url, headers=headers)
         list_content = json.loads(response.text)
         if response.status_code == 200:
-            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': list_content['list']['pagination']['totalItems']})
+            wiz_ob = self.env['pop.list.content'].create(
+                {'popup_list_content': list_content['list']['pagination']['totalItems']})
             return {
                 'name': _('Content of Repository'),
                 'view_type': 'form',
@@ -139,19 +141,19 @@ class Manage_Files_Folders(models.TransientModel):
         base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         headers = {
-            'Content-Type': 'application/json',
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
-        # a = json.loads(self.alf_file_name)
 
-        datas = {
-                "Content": self.alf_file_name,
-                "name": 'Nikunj.txt',
-                "nodeType": "cm:content",
-                # "filedata": a
-            }
+        files = {
+            'filedata': (
+                '/home/user/Downloads/Ashutosh_Resume.pdf', open('/home/user/Downloads/Ashutosh_Resume.pdf', 'rb')),
+            'name': (None, 'Ashutosh_Resume.pdf'),
+            'nodeType': (None, 'cm:content'),
+            'cm:title': (None, 'My text'),
+            'cm:description': (None, 'My text document description'),
+            'relativePath': (None, '/Test'),
+        }
 
-        response = requests.post(base_url, data=json.dumps(datas), headers=headers)
+        response = requests.post(base_url, headers=headers, files=files)
         if response.status_code == 201:
-            print(response)
-
+            print("OK")
