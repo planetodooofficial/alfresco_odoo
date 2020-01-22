@@ -5,4 +5,10 @@ from odoo import api, fields, models, _, tools
 class PopMessages(models.TransientModel):
     _name = 'pop.messages'
 
-    popup_text = fields.Char('Your email has been sent.', readonly=True)
+    popup_text = fields.Char("String", readonly=True)
+
+
+class PopUpListContent(models.TransientModel):
+    _name = 'pop.list.content'
+
+    popup_list_content = fields.Char("Pop Up", readonly=True)
