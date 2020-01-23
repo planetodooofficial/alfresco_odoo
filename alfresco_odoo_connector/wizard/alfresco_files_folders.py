@@ -36,7 +36,7 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/Test'
+        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         datas = {
             "name": str(self.alf_folder_name),
@@ -55,14 +55,28 @@ class Manage_Files_Folders(models.TransientModel):
 
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201:
-            print((json.loads(response.text)["entry"]["name"]))
+            wiz_ob = self.env['pop.folder'].create(
+                {'pop_up': "Folder" + json.loads(response.text)["entry"]["name"] + "been created"})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.folder',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
 
     def update_folder(self):
         """This function is to update folder name in your root directory."""
 
+        list_of_id = []
+
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
+        url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
 
         datas = {
             "name": str(self.alf_folder_name),
@@ -78,6 +92,15 @@ class Manage_Files_Folders(models.TransientModel):
             'Content-Type': 'application/json',
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
+
+        response_get_id = requests.get(url, headers=headers)
+        text = json.loads(response_get_id.text)
+        get_id = text['list']['entries']
+        for rec in get_id:
+            list_of_id.append(rec['entry']['id'])
+
+        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + \
+                   list_of_id[1]
 
         response = requests.put(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 200:

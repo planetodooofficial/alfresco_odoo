@@ -43,4 +43,34 @@
             </form>
         </field>
     </record>
+
+    <record id="pop_site_wizard_view" model="ir.ui.view">
+        <field name="name">pop.site.content</field>
+        <field name="model">site</field>
+        <field name="arch" type="xml">
+            <form string="Alert">
+                <group>
+                    <field name="pop_up" nolabel="1"/>
+                </group>
+                <footer>
+                    <button special="cancel" string="OK" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="pop_folder_wizard_view" model="ir.ui.view">
+        <field name="name">pop.folder.content</field>
+        <field name="model">pop.folder</field>
+        <field name="arch" type="xml">
+            <form string="Alert">
+                <group>
+                    <field name="pop_up" nolabel="1"/>
+                </group>
+                <footer>
+                    <button special="cancel" string="OK" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 </odoo>

@@ -1,4 +1,3 @@
-
 from odoo import api, fields, models, _, tools
 
 
@@ -14,7 +13,19 @@ class PopUpListContent(models.TransientModel):
     popup_list_content = fields.Char("Pop Up", readonly=True)
 
 
+class PopUpFolder(models.TransientModel):
+    _name = 'pop.folder'
+
+    pop_up = fields.Char("Pop Up", readonly=True)
+
+
 class PopUpFileCreateMsg(models.TransientModel):
     _name = 'file.msg'
+
+    pop_up = fields.Char("Pop Up", readonly=True)
+
+
+class PopUpSite(models.TransientModel):
+    _name = 'site'
 
     pop_up = fields.Char("Pop Up", readonly=True)

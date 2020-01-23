@@ -38,11 +38,47 @@ class ManagingSites(models.TransientModel):
 
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201:
-            print("Successful")
+            wiz_ob = self.env['site'].create(
+                {'pop_up': 'Your site has been created.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'site',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
         elif response.status_code == 401:
-            print("Authentication failed")
+            wiz_ob = self.env['site'].create(
+                {'pop_up': 'Authentication Failed.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'site',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
         elif response.status_code == 409:
-            print("Site with the given identifier already exists")
+            wiz_ob = self.env['site'].create(
+                {'pop_up': 'Site with the given identifier already exists.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'site',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
 
     def update_site(self):
         """This function Updates the metadata for an Alfresco Share site."""
@@ -75,11 +111,23 @@ class ManagingSites(models.TransientModel):
         }
 
         url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/' + list_of_id[
-            1]
+            2]
 
         response = requests.put(url, data=json.dumps(datas), headers=headers)
         if response.status_code == 200:
-            print("OK")
+            wiz_ob = self.env['site'].create(
+                {'pop_up': 'Site with the given identifier updated successfully.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'site',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
 
     def add_content_to_site(self):
         """This function Creates folders and add files to an Alfresco Share site's Document Library."""
