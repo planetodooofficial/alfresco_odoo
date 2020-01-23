@@ -15,7 +15,7 @@ class ManagingSites(models.TransientModel):
     alf_site_description = fields.Char("Site Description")
     alf_site_visibility = fields.Selection([('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE'), ('MODERATED', 'MODERATED')],
                                            string="Site Visibility")
-    alf_site_id = fields.Many2one("Site ID's")
+    alf_site_search = fields.Char("Site ID's")
 
     def create_site(self):
         """This function Creates an Alfresco Share site."""
@@ -50,6 +50,8 @@ class ManagingSites(models.TransientModel):
         list_of_id = []
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
+
+        search_url = 'http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + ''
 
         base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites'
 

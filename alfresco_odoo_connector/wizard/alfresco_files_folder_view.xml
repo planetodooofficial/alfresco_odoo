@@ -10,20 +10,16 @@
                     <group>
                         <group>
                             <field name="alf_folder_name"/>
-                            <field name="alf_folder_title"/>
-                            <field name="alf_folder_desc"/>
-                        </group>
-                        <group>
-                            <field name="alf_file_name"/>
+                            <field name="alf_folder_title" placeholder="optional"/>
+                            <field name="alf_folder_desc" placeholder="optional"/>
                         </group>
                     </group>
                     <footer>
                         <button name="create_folder" string="Create Folder" type="object" class="oe_highlight"/>
                         <button name="update_folder" string="Update Folder" type="object" class="oe_highlight"/>
-                        <button name="list_contents_for_folders" string="List Content" type="object" class="oe_highlight"/>
-                        <button name="filer_contents_of_folder" string="Filter Content" type="object" class="oe_highlight"/>
-                        <button name="get_folder_file_metadata" string="Get Metadata" type="object" class="oe_highlight"/>
-                        <button name="upload_file" string="Upload a File" type="object" class="oe_highlight"/>
+                        <!--                        <button name="list_contents_for_folders" string="List Content" type="object" class="oe_highlight"/>-->
+                        <!--                        <button name="filter_contents_of_folder" string="Filter Content" type="object" class="oe_highlight"/>-->
+                        <!--                        <button name="get_folder_file_metadata" string="Get Metadata" type="object" class="oe_highlight"/>-->
                         <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
@@ -31,7 +27,7 @@
         </record>
 
         <record id="action_files_folder" model="ir.actions.act_window">
-            <field name="name">Files &amp; Folder</field>
+            <field name="name">Manage Folders</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">alfresco.files.folder</field>
             <field name="view_type">form</field>
@@ -40,8 +36,45 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem id="menu_file_folder" name="Files &amp; Folder" parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
-        <menuitem id="sub_menu_create_folder" name="Create Folder" action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder"/>
+        <menuitem id="menu_file_folder" name="Files &amp; Folder"
+                  parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
+        <menuitem id="sub_menu_create_folder" name="Create Folder"
+                  action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder"/>
 
+        <!--        Manage Files-->
+
+        <record id="files_form_id" model="ir.ui.view">
+            <field name="name">files.id</field>
+            <field name="model">alfresco.files.folder</field>
+            <field name="arch" type="xml">
+                <form string="Uplaod File">
+                    <group>
+                        <group>
+                            <field name="alf_file" filename="alf_file_name"/>
+                            <field name="alf_file_title" placeholder="optional"/>
+                            <field name="alf_file_description" placeholder="optional"/>
+                            <field name="alf_file_name" invisible="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="upload_file" string="Upload File" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_files" model="ir.actions.act_window">
+            <field name="name">Manage Files</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alfresco.files.folder</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="files_form_id"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="sub_menu_upload_file" name="Upload Files"
+                  action="action_files" parent="alfresco_odoo_connector.menu_file_folder"/>
     </data>
 </odoo>

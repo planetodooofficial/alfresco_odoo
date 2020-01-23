@@ -1,4 +1,7 @@
 import base64
+import csv
+from tempfile import TemporaryFile
+from io import StringIO
 
 from odoo import api, fields, models, _, tools
 from odoo.exceptions import UserError, ValidationError
@@ -6,6 +9,8 @@ import logging
 import requests
 import json
 import os
+import binascii
+import codecs
 
 _logger = logging.getLogger(__name__)
 
@@ -21,7 +26,10 @@ class Manage_Files_Folders(models.TransientModel):
     alf_folder_title = fields.Char("Folder Title")
     alf_folder_desc = fields.Char("Folder Description")
 
-    alf_file_name = fields.Binary("Upload a File")
+    alf_file = fields.Binary("Upload a File")
+    alf_file_name = fields.Char("File Name")
+    alf_file_title = fields.Char("File Title")
+    alf_file_description = fields.Char("File Description")
 
     def create_folder(self):
         """This function is to create folders in your root directory."""
@@ -104,7 +112,7 @@ class Manage_Files_Folders(models.TransientModel):
                 'type': 'ir.actions.act_window',
             }
 
-    def filer_contents_of_folder(self):
+    def filter_contents_of_folder(self):
         """This function will list the contents of a folder in the repository"""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
@@ -141,13 +149,14 @@ class Manage_Files_Folders(models.TransientModel):
         base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         headers = {
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket),
         }
 
+        data = base64.b64decode(self.alf_file)
+
         files = {
-            'filedata': (
-                '/home/user/Downloads/Ashutosh_Resume.pdf', open('/home/user/Downloads/Ashutosh_Resume.pdf', 'rb')),
-            'name': (None, 'Ashutosh_Resume.pdf'),
+            'filedata': data,
+            'name': (None, self.alf_file_name),
             'nodeType': (None, 'cm:content'),
             'cm:title': (None, 'My text'),
             'cm:description': (None, 'My text document description'),
@@ -156,4 +165,42 @@ class Manage_Files_Folders(models.TransientModel):
 
         response = requests.post(base_url, headers=headers, files=files)
         if response.status_code == 201:
-            print("OK")
+            wiz_ob = self.env['file.msg'].create({'pop_up': 'Your file has been uploaded.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'file.msg',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+        elif response.status_code == 409:
+            wiz_ob = self.env['file.msg'].create({'pop_up': 'New name clashes with an existing file in the current folder.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'file.msg',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+        elif response.status_code == 401:
+            wiz_ob = self.env['file.msg'].create({'pop_up': 'Authentication failed.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'file.msg',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+
