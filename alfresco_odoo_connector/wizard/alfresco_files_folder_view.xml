@@ -36,10 +36,47 @@
             <field name="target">new</field>
         </record>
 
+        <!--   Update Folder  -->
+
+        <record id="folder_form_id" model="ir.ui.view">
+            <field name="name">folder.id</field>
+            <field name="model">alfresco.files.folder</field>
+            <field name="arch" type="xml">
+                <form string="Update Folder">
+                    <group>
+                        <group>
+                            <field name="alf_search_folder"/>
+                        </group>
+                        <group>
+                            <field name="alf_folder_name"/>
+                            <field name="alf_folder_title" placeholder="optional"/>
+                            <field name="alf_folder_desc" placeholder="optional"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="update_folder" string="Update Folder" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_folder_update" model="ir.actions.act_window">
+            <field name="name">Update Folders</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alfresco.files.folder</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="folder_form_id"/>
+            <field name="target">new</field>
+        </record>
+
         <menuitem id="menu_file_folder" name="Files &amp; Folder"
                   parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
         <menuitem id="sub_menu_create_folder" name="Create Folder"
-                  action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder"/>
+                  action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder" sequence="1"/>
+        <menuitem id="sub_menu_update_folder" name="Update Folder"
+                  action="action_folder_update" parent="alfresco_odoo_connector.menu_file_folder" sequence="2"/>
 
         <!--        Manage Files-->
 
@@ -75,6 +112,6 @@
         </record>
 
         <menuitem id="sub_menu_upload_file" name="Upload Files"
-                  action="action_files" parent="alfresco_odoo_connector.menu_file_folder"/>
+                  action="action_files" parent="alfresco_odoo_connector.menu_file_folder" sequence="3"/>
     </data>
 </odoo>

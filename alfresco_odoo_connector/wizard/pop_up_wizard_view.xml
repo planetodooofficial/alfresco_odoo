@@ -5,7 +5,16 @@
         <field name="arch" type="xml">
             <form string="Alert">
                 <group>
-                    <field name="popup_text" nolabel="1"/>
+                    <group>
+                        <field name="popup_edition" nolabel="1"/>
+                        <field name="popup_version" nolabel="1"/>
+                    </group>
+                    <group>
+                        <field name="popup_license" nolabel="1"/>
+                        <field name="popup_license_issued_at" nolabel="1"/>
+                        <field name="popup_license_issued_till" nolabel="1"/>
+                        <field name="popup_license_days" nolabel="1"/>
+                    </group>
                 </group>
                 <footer>
                     <button special="cancel" string="OK" class="oe_highlight"/>
@@ -73,4 +82,20 @@
             </form>
         </field>
     </record>
+
+    <record id="pop_auth_wizard_view" model="ir.ui.view">
+        <field name="name">pop.auth.content</field>
+        <field name="model">pop.auth</field>
+        <field name="arch" type="xml">
+            <form string="Alert">
+                <group>
+                    <field name="pop_up" nolabel="1"/>
+                </group>
+                <footer>
+                    <button special="cancel" string="OK" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
 </odoo>

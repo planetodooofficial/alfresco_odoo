@@ -42,10 +42,12 @@
                 <form string="Update Alfresco Share Site">
                     <group>
                         <group>
+                            <field name="alf_site_search"/>
+                        </group>
+                        <group>
                             <field name="alf_site_name"/>
                             <field name="alf_site_description"/>
                             <field name="alf_site_visibility"/>
-                            <field name="alf_site_search"/>
                         </group>
                     </group>
                     <footer>

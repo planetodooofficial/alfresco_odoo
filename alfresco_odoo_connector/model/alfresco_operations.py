@@ -43,6 +43,34 @@ class AlfrescoOperations(models.Model):
             if auth_token:
                 self.alf_encoded_ticket = auth_token
 
+                wiz_ob = self.env['pop.auth'].create(
+                    {'pop_up': 'Your Ticket' + " " + str(ticket) + " " + 'has been generated.'})
+                return {
+                    'name': _('Authentication'),
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'pop.auth',
+                    'res_id': wiz_ob.id,
+                    'view_id': False,
+                    'target': 'new',
+                    'views': False,
+                    'type': 'ir.actions.act_window',
+                }
+            elif response.status_code == 403:
+                wiz_ob = self.env['pop.auth'].create(
+                    {'pop_up': 'Login Failed! Please try again.'})
+                return {
+                    'name': _('Authentication'),
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'pop.auth',
+                    'res_id': wiz_ob.id,
+                    'view_id': False,
+                    'target': 'new',
+                    'views': False,
+                    'type': 'ir.actions.act_window',
+                }
+
         except Exception as e:
             raise e
 
@@ -59,7 +87,18 @@ class AlfrescoOperations(models.Model):
 
         response = requests.get(repo_url, headers=token_headers)
         if response.status_code == 200:
-            wiz_ob = self.env['pop.messages'].create({'popup_text': 'Successful.'})
+            response_text = json.loads(response.text)
+            wiz_ob = self.env['pop.messages']. \
+                create({'popup_edition': 'Edition: ' + response_text['entry']['repository']['edition'],
+                        'popup_version': 'Version: ' + 'v' + response_text['entry']['repository']['version']['major'] + '.' +
+                                         response_text['entry']['repository']['version']['minor'] + '.' +
+                                         response_text['entry']['repository']['version']['patch'] + '.' +
+                                         response_text['entry']['repository']['version']['hotfix'],
+                        'popup_license': 'License: ' + response_text['entry']['repository']['license']['holder'],
+                        'popup_license_issued_at': 'Issued At: ' + response_text['entry']['repository']['license']['issuedAt'],
+                        'popup_license_issued_till': 'Issued Till: ' + response_text['entry']['repository']['license']['expiresAt'],
+                        'popup_license_days': 'Remaining Days: ' + str(response_text['entry']['repository']['license']['remainingDays'])
+                        })
             return {
                 'name': _('Repository Information'),
                 'view_type': 'form',
@@ -71,8 +110,8 @@ class AlfrescoOperations(models.Model):
                 'views': False,
                 'type': 'ir.actions.act_window',
             }
-        else:
-            wiz_ob1 = self.env['pop.messages'].create({'popup_text': 'Bad Response.'})
+        elif response.status_code == 401:
+            wiz_ob1 = self.env['pop.messages'].create({'popup_edition': 'Bad Response.'})
             return {
                 'name': _('Repository Information'),
                 'view_type': 'form',

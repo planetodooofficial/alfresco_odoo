@@ -1,18 +1,19 @@
 import base64
-import csv
-from tempfile import TemporaryFile
-from io import StringIO
 
 from odoo import api, fields, models, _, tools
-from odoo.exceptions import UserError, ValidationError
 import logging
 import requests
 import json
-import os
-import binascii
-import codecs
 
 _logger = logging.getLogger(__name__)
+
+
+class Folder(models.Model):
+    """This class contains all the folder's that are created in Alfresco Repository."""
+    _name = 'save.folder'
+
+    name = fields.Char('Folders')
+    folder_id = fields.Char('Id')
 
 
 class Manage_Files_Folders(models.TransientModel):
@@ -27,9 +28,12 @@ class Manage_Files_Folders(models.TransientModel):
     alf_folder_desc = fields.Char("Folder Description")
 
     alf_file = fields.Binary("Upload a File")
+
     alf_file_name = fields.Char("File Name")
     alf_file_title = fields.Char("File Title")
     alf_file_description = fields.Char("File Description")
+
+    alf_search_folder = fields.Many2one('save.folder', string="Select Folder")
 
     def create_folder(self):
         """This function is to create folders in your root directory."""
@@ -55,10 +59,14 @@ class Manage_Files_Folders(models.TransientModel):
 
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201:
+            data = json.loads(response.text)
+            self.env['save.folder'].create({'name': data['entry']['name'],
+                                            'folder_id': data['entry']['id']})
+
             wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder" + json.loads(response.text)["entry"]["name"] + "been created"})
+                {'pop_up': "Folder" + " " + json.loads(response.text)["entry"]["name"] + " " + "been created"})
             return {
-                'name': _('Alert'),
+                'name': _('Manage Folder'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',
@@ -72,11 +80,9 @@ class Manage_Files_Folders(models.TransientModel):
     def update_folder(self):
         """This function is to update folder name in your root directory."""
 
-        list_of_id = []
-
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
+        folder = self.env['save.folder'].search([('name', '=', self.alf_search_folder.name)])
 
         datas = {
             "name": str(self.alf_folder_name),
@@ -93,18 +99,24 @@ class Manage_Files_Folders(models.TransientModel):
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
 
-        response_get_id = requests.get(url, headers=headers)
-        text = json.loads(response_get_id.text)
-        get_id = text['list']['entries']
-        for rec in get_id:
-            list_of_id.append(rec['entry']['id'])
-
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + \
-                   list_of_id[1]
+        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(folder.folder_id)
 
         response = requests.put(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 200:
-            print((json.loads(response.text)["entry"]["name"]))
+            data = json.loads(response.text)["entry"]["name"]
+            wiz_ob = self.env['pop.folder'].create(
+                {'pop_up': "Folder" + " " + data + " " + "has been updated"})
+            return {
+                'name': _('Manage Folder'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.folder',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
 
     def list_contents_for_folders(self):
         """This function will list all the content of the folder in the Repository"""
