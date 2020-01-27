@@ -58,13 +58,30 @@ class Manage_Files_Folders(models.TransientModel):
         }
 
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
+        data = json.loads(response.text)
         if response.status_code == 201:
-            data = json.loads(response.text)
             self.env['save.folder'].create({'name': data['entry']['name'],
                                             'folder_id': data['entry']['id']})
 
             wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder" + " " + json.loads(response.text)["entry"]["name"] + " " + "been created"})
+                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "been created"})
+
+            return {
+                'name': _('Manage Folder'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.folder',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+
+        elif response.status_code == 409:
+            wiz_ob = self.env['pop.folder'].create(
+                {'pop_up': data["error"]["errorKey"]})
+
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -99,13 +116,19 @@ class Manage_Files_Folders(models.TransientModel):
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(folder.folder_id)
+        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            folder.folder_id)
 
         response = requests.put(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 200:
-            data = json.loads(response.text)["entry"]["name"]
+            data = json.loads(response.text)
+
+            existing_folder = self.env['save.folder'].search([('folder_id', '=', data['entry']['id'])])
+            existing_folder.write({'name': data['entry']['name'],
+                                   'folder_id': data['entry']['id']})
+
             wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder" + " " + data + " " + "has been updated"})
+                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "has been updated"})
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -213,7 +236,8 @@ class Manage_Files_Folders(models.TransientModel):
                 'type': 'ir.actions.act_window',
             }
         elif response.status_code == 409:
-            wiz_ob = self.env['file.msg'].create({'pop_up': 'New name clashes with an existing file in the current folder.'})
+            wiz_ob = self.env['file.msg'].create(
+                {'pop_up': 'New name clashes with an existing file in the current folder.'})
             return {
                 'name': _('Alert'),
                 'view_type': 'form',
@@ -238,4 +262,3 @@ class Manage_Files_Folders(models.TransientModel):
                 'views': False,
                 'type': 'ir.actions.act_window',
             }
-

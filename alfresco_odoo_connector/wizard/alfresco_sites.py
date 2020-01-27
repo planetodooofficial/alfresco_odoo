@@ -13,6 +13,7 @@ class Sites(models.Model):
 
     name = fields.Char('Site Name')
     site_id = fields.Char('Site ID')
+    site_document_id = fields.Char('Site Document Id')
 
 
 class ManagingSites(models.TransientModel):
@@ -22,7 +23,11 @@ class ManagingSites(models.TransientModel):
     alf_site_description = fields.Char("Site Description")
     alf_site_visibility = fields.Selection([('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE'), ('MODERATED', 'MODERATED')],
                                            string="Site Visibility")
+
     alf_site_search = fields.Many2one('save.sites', string="Select Site")
+
+    alf_site_upload_content = fields.Binary(string='Upload Content')
+    alf_site_file_name = fields.Char("File Name")
 
     def create_site(self):
         """This function Creates an Alfresco Share site."""
@@ -110,11 +115,16 @@ class ManagingSites(models.TransientModel):
             "visibility": str(self.alf_site_visibility)
         }
 
-        url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/' + str(sites.site_id)
+        url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/' + str(
+            sites.site_id)
 
         response = requests.put(url, data=json.dumps(datas), headers=headers)
         data = json.loads(response.text)
         if response.status_code == 200:
+            existing_site = self.env['save.sites'].search([('site_id', '=', data['entry']['id'])])
+            existing_site.write({'name': data['entry']['title'],
+                                 'site_id': data['entry']['id']})
+
             wiz_ob = self.env['site'].create(
                 {'pop_up': 'Site with the given identifier updated successfully.'})
             return {
@@ -160,31 +170,59 @@ class ManagingSites(models.TransientModel):
     def add_content_to_site(self):
         """This function Creates folders and add files to an Alfresco Share site's Document Library."""
 
-        list_of_id = []
-
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/'
+        sites = self.env['save.sites'].search([('name', '=', self.alf_site_search.name)])
+
+        document_lib_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/' + sites.site_id + '/containers/documentLibrary'
+
+        document_lib_headers = {
+            'Accept': 'application/json',
+            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+        }
+
+        response_doc = requests.get(document_lib_url, headers=document_lib_headers)
+        data_doc = json.loads(response_doc.text)
+        if response_doc.status_code == 200:
+            existing_site = self.env['save.sites'].search([('site_id', '=', sites.site_id)])
+            existing_site.write({'name': sites.name,
+                                 'site_id': sites.site_id,
+                                 'site_document_id': data_doc['entry']['id']})
+
+        url = 'https://afvdpi.trial.alfresco.com/api/-default-/public/alfresco/versions/1/nodes/' + str(sites.site_document_id) + '/children'
 
         headers = {
-            'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
 
-        response_get_id = requests.get(base_url, headers=headers)
-        text_id = json.loads(response_get_id.text)
-        get_id = text_id['list']['entries']
-        for rec in get_id:
-            list_of_id.append(rec['entry']['id'])
-        print(list_of_id)
+        datas = {
+            "name": "My" + " " + sites.name + " " + "Stuff",
+            "nodeType": "cm:folder"
+        }
 
-        entry_url = 'http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/sites/' + list_of_id[1] + \
-                    '/containers/documentLibrary'
+        response_entry = requests.post(url, data=json.dumps(datas), headers=headers)
+        data = json.loads(response_entry.text)
+        site_folder_id = False
+        if response_entry.status_code == 200:
+            site_folder_id = data['entry']['id']
 
-        response_entry = requests.get(entry_url, headers=headers)
-        text_entry = json.loads(response_entry.text)
-        get_folder_id = text_entry['entry']['id']
+        data_file = base64.b64decode(self.alf_site_upload_content)
+
+        site_url = 'https://afvdpi.trial.alfresco.com/api/-default-/public/alfresco/versions/1/nodes/' + site_folder_id + '/children'
+
+        file_header = {
+            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+        }
+
+        files = {
+            'filedata': data_file,
+            'name': (None, self.alf_site_file_name),
+            'nodeType': (None, 'cm:content'),
+        }
+
+        response = requests.post(site_url, headers=file_header, files=files)
+        print(response)
 
     def add_members_to_site(self):
         """This function add members to an Alfresco Share site."""

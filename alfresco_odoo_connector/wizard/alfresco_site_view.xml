@@ -68,9 +68,44 @@
             <field name="target">new</field>
         </record>
 
+        <!--        Upload Content to Site-->
+
+        <record id="sites_content_id" model="ir.ui.view">
+            <field name="name">manage.sites</field>
+            <field name="model">manage.sites</field>
+            <field name="arch" type="xml">
+                <form string="Content to Alfresco Share Site">
+                    <group>
+                        <group>
+                            <field name="alf_site_search" filename="alf_site_file_name"/>
+                            <field name="alf_site_file_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="alf_site_upload_content"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="add_content_to_site" string="Add Content To Site" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_add_content_sites" model="ir.actions.act_window">
+            <field name="name">Add Content Alfresco Share Site</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">manage.sites</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sites_content_id"/>
+            <field name="target">new</field>
+        </record>
+
         <menuitem id="menu_manage_sites" name="Sites" parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
         <menuitem id="sub_menu_create_sites" name="Create Sites" action="action_manage_sites" parent="alfresco_odoo_connector.menu_manage_sites"/>
         <menuitem id="sub_menu_update_sites" name="Update Sites" action="action_update_sites" parent="alfresco_odoo_connector.menu_manage_sites"/>
+        <menuitem id="sub_menu_content_to_sites" name="Add Content To Site" action="action_add_content_sites" parent="alfresco_odoo_connector.menu_manage_sites"/>
 
     </data>
 </odoo>
