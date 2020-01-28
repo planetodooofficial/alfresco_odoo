@@ -18,8 +18,7 @@
         <field name="arch" type="xml">
             <tree string="Operation Details">
                 <field name="alf_username"/>
-                <field name="alf_ticket" force_save="1"/>
-                <field name="alf_encoded_ticket" force_save="1"/>
+                <field name="alf_base_url"/>
             </tree>
         </field>
     </record>
@@ -36,12 +35,12 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="alf_username"/>
-                            <field name="alf_password" password="True"/>
-                            <field name="alf_ticket" force_save="1"/>
-                            <field name="alf_encoded_ticket" force_save="1"/>
+                            <field name="alf_username" required="1"/>
+                            <field name="alf_password" required="1" password="True"/>
+                            <field name="alf_base_url" required="1" force_save="1" placeholder="http://localhost:8080"/>
+                            <field name="alf_ticket" force_save="1" invisible="1"/>
+                            <field name="alf_encoded_ticket" force_save="1" invisible="1"/>
                         </group>
-
                     </group>
                 </sheet>
             </form>

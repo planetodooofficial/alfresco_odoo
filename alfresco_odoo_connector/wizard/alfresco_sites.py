@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 
 class Sites(models.Model):
-    _name = 'save.sites'
+    _name = 'sites.details'
 
     name = fields.Char('Site Name')
     site_id = fields.Char('Site ID')
@@ -24,7 +24,7 @@ class ManagingSites(models.TransientModel):
     alf_site_visibility = fields.Selection([('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE'), ('MODERATED', 'MODERATED')],
                                            string="Site Visibility")
 
-    alf_site_search = fields.Many2one('save.sites', string="Select Site")
+    alf_site_search = fields.Many2one('sites.details', string="Select Site")
 
     alf_site_upload_content = fields.Binary(string='Upload Content')
     alf_site_file_name = fields.Char("File Name")
@@ -34,25 +34,31 @@ class ManagingSites(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/sites'
 
         datas = {
-            "title": str(self.alf_site_name),
-            "description": str(self.alf_site_description),
-            "visibility": str(self.alf_site_visibility)
+            "title": self.alf_site_name,
+            "description": self.alf_site_description,
+            "visibility": self.alf_site_visibility
         }
 
         headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201:
             data = json.loads(response.text)
-            self.env['save.sites'].create({'name': data['entry']['title'],
-                                           'site_id': data['entry']['id']})
+
+            # This is to check if the site exist. If the folder exist, it will write the new name of the site
+            # if the site is not there, it will create a new record with the respective site name.
+
+            self.env['sites.details'].create({'name': data['entry']['title'],
+                                              'site_id': data['entry']['id']})
+
+            # This Wizard is use to display the information which we are getting in Response.
 
             wiz_ob = self.env['site'].create(
                 {'pop_up': 'Your site' + " " + data['entry']['title'] + " " + 'has been created.'})
@@ -101,7 +107,7 @@ class ManagingSites(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        sites = self.env['save.sites'].search([('name', '=', self.alf_site_search.name)])
+        sites = self.env['sites.details'].search([('name', '=', self.alf_site_search.name)])
 
         headers = {
             'Accept': 'application/json',
@@ -115,18 +121,23 @@ class ManagingSites(models.TransientModel):
             "visibility": str(self.alf_site_visibility)
         }
 
-        url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/' + str(
+        url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/sites/' + str(
             sites.site_id)
 
         response = requests.put(url, data=json.dumps(datas), headers=headers)
         data = json.loads(response.text)
         if response.status_code == 200:
-            existing_site = self.env['save.sites'].search([('site_id', '=', data['entry']['id'])])
+
+            # This is to check if the site exist. If the folder exist, it will write the new name of the site
+            # if the site is not there, it will create a new record with the respective site name.
+
+            existing_site = self.env['sites.details'].search([('site_id', '=', data['entry']['id'])])
             existing_site.write({'name': data['entry']['title'],
                                  'site_id': data['entry']['id']})
 
-            wiz_ob = self.env['site'].create(
-                {'pop_up': 'Site with the given identifier updated successfully.'})
+            # This Wizard is use to display the information which we are getting in Response.
+
+            wiz_ob = self.env['site'].create({'pop_up': 'Site with the given identifier updated successfully.'})
             return {
                 'name': _('Alert'),
                 'view_type': 'form',
@@ -172,9 +183,9 @@ class ManagingSites(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        sites = self.env['save.sites'].search([('name', '=', self.alf_site_search.name)])
+        sites = self.env['sites.details'].search([('name', '=', self.alf_site_search.name)])
 
-        document_lib_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/sites/' + sites.site_id + '/containers/documentLibrary'
+        document_lib_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/sites/' + sites.site_id + '/containers/documentLibrary'
 
         document_lib_headers = {
             'Accept': 'application/json',
@@ -184,12 +195,17 @@ class ManagingSites(models.TransientModel):
         response_doc = requests.get(document_lib_url, headers=document_lib_headers)
         data_doc = json.loads(response_doc.text)
         if response_doc.status_code == 200:
-            existing_site = self.env['save.sites'].search([('site_id', '=', sites.site_id)])
+
+            # This is to check if the site exist. If the folder exist, it will write the new name of the site
+            # if the site is not there, it will create a new record with the respective site name.
+
+            existing_site = self.env['sites.details'].search([('site_id', '=', sites.site_id)])
             existing_site.write({'name': sites.name,
                                  'site_id': sites.site_id,
                                  'site_document_id': data_doc['entry']['id']})
 
-        url = 'https://afvdpi.trial.alfresco.com/api/-default-/public/alfresco/versions/1/nodes/' + str(sites.site_document_id) + '/children'
+        url = ticket.alf_base_url + '/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            sites.site_document_id) + '/children'
 
         headers = {
             'Content-Type': 'application/json',
@@ -209,7 +225,7 @@ class ManagingSites(models.TransientModel):
 
         data_file = base64.b64decode(self.alf_site_upload_content)
 
-        site_url = 'https://afvdpi.trial.alfresco.com/api/-default-/public/alfresco/versions/1/nodes/' + site_folder_id + '/children'
+        site_url = ticket.alf_base_url + '/api/-default-/public/alfresco/versions/1/nodes/' + site_folder_id + '/children'
 
         file_header = {
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)

@@ -1,6 +1,5 @@
-import base64
-
 from odoo import api, fields, models, _, tools
+import base64
 import logging
 import requests
 import json
@@ -10,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 class Folder(models.Model):
     """This class contains all the folder's that are created in Alfresco Repository."""
-    _name = 'save.folder'
+    _name = 'folder.details'
 
     name = fields.Char('Folders')
     folder_id = fields.Char('Id')
@@ -26,46 +25,46 @@ class Manage_Files_Folders(models.TransientModel):
     alf_folder_name = fields.Char("Folder Name")
     alf_folder_title = fields.Char("Folder Title")
     alf_folder_desc = fields.Char("Folder Description")
+    alf_folder_path = fields.Many2one('folder.details', string="Relative Path")
 
     alf_file = fields.Binary("Upload a File")
-
     alf_file_name = fields.Char("File Name")
     alf_file_title = fields.Char("File Title")
     alf_file_description = fields.Char("File Description")
 
-    alf_search_folder = fields.Many2one('save.folder', string="Select Folder")
+    alf_search_folder = fields.Many2one('folder.details', string="Select Folder")
 
     def create_folder(self):
         """This function is to create folders in your root directory."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         datas = {
-            "name": str(self.alf_folder_name),
+            "name": self.alf_folder_name,
             "nodeType": "cm:folder",
             "properties":
                 {
-                    "cm:title": str(self.alf_folder_title),
-                    "cm:description": str(self.alf_folder_desc)
+                    "cm:title": self.alf_folder_title,
+                    "cm:description": self.alf_folder_desc
                 }
         }
 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         data = json.loads(response.text)
         if response.status_code == 201:
-            self.env['save.folder'].create({'name': data['entry']['name'],
-                                            'folder_id': data['entry']['id']})
+            self.env['folder.details'].create({'name': data['entry']['name'],
+                                               'folder_id': data['entry']['id']})
 
-            wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "been created"})
+            # This Wizard is use to display the information which we are getting in Response.
 
+            wiz_ob = self.env['pop.folder'].create({'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "been created"})
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -79,9 +78,20 @@ class Manage_Files_Folders(models.TransientModel):
             }
 
         elif response.status_code == 409:
-            wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': data["error"]["errorKey"]})
-
+            wiz_ob = self.env['pop.folder'].create({'pop_up': data["error"]["errorKey"]})
+            return {
+                'name': _('Manage Folder'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.folder',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+        else:
+            wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -99,36 +109,53 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        folder = self.env['save.folder'].search([('name', '=', self.alf_search_folder.name)])
+        folder = self.env['folder.details'].search([('name', '=', self.alf_search_folder.name)])
 
         datas = {
-            "name": str(self.alf_folder_name),
+            "name": self.alf_folder_name,
             "nodeType": "cm:folder",
             "properties":
                 {
-                    "cm:title": str(self.alf_folder_title),
-                    "cm:description": str(self.alf_folder_desc)
+                    "cm:title": self.alf_folder_title,
+                    "cm:description": self.alf_folder_desc
                 }
         }
 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
-            folder.folder_id)
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + folder.folder_id
 
         response = requests.put(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 200:
             data = json.loads(response.text)
 
-            existing_folder = self.env['save.folder'].search([('folder_id', '=', data['entry']['id'])])
+            # This is to check if the folder exist. If the folder exist, it will write the new name of the folder
+            # if the folder is not there, it will create a new record with the respective folder name.
+
+            existing_folder = self.env['folder.details'].search([('folder_id', '=', data['entry']['id'])])
             existing_folder.write({'name': data['entry']['name'],
                                    'folder_id': data['entry']['id']})
 
-            wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "has been updated"})
+            # This Wizard is use to display the information which we are getting in Response.
+
+            wiz_ob = self.env['pop.folder'].create({'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "has been updated"})
+            return {
+                'name': _('Manage Folder'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.folder',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+
+        else:
+            wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -146,18 +173,33 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100'
 
         headers = {
             'Accept': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
         response = requests.get(base_url, headers=headers)
         list_content = json.loads(response.text)
         if response.status_code == 200:
-            wiz_ob = self.env['pop.list.content'].create(
-                {'popup_list_content': list_content['list']['pagination']['totalItems']})
+
+            # This Wizard is use to display the information which we are getting in Response.
+
+            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': list_content['list']['pagination']['totalItems']})
+            return {
+                'name': _('Content of Repository'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.list.content',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+        else:
+            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Please check your request and try again!'})
             return {
                 'name': _('Content of Repository'),
                 'view_type': 'form',
@@ -175,11 +217,11 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = "https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
+        base_url = ticket.alf_base_url + "/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
 
         headers = {
             'Accept': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
         response = requests.get(base_url, headers=headers)
@@ -189,7 +231,7 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
 
         headers = {
             'Accept': 'application/json',
@@ -204,25 +246,26 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = 'https://afvdpi.trial.alfresco.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         headers = {
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket),
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        data = base64.b64decode(self.alf_file)
+        file_data = base64.b64decode(self.alf_file)
 
         files = {
-            'filedata': data,
+            'filedata': file_data,
             'name': (None, self.alf_file_name),
             'nodeType': (None, 'cm:content'),
-            'cm:title': (None, 'My text'),
-            'cm:description': (None, 'My text document description'),
-            'relativePath': (None, '/Test'),
+            'relativePath': (None, "/" + self.alf_folder_path.name),
         }
 
         response = requests.post(base_url, headers=headers, files=files)
         if response.status_code == 201:
+
+            # This Wizard is use to display the information which we are getting in Response.
+
             wiz_ob = self.env['file.msg'].create({'pop_up': 'Your file has been uploaded.'})
             return {
                 'name': _('Alert'),
@@ -249,8 +292,8 @@ class Manage_Files_Folders(models.TransientModel):
                 'views': False,
                 'type': 'ir.actions.act_window',
             }
-        elif response.status_code == 401:
-            wiz_ob = self.env['file.msg'].create({'pop_up': 'Authentication failed.'})
+        else:
+            wiz_ob = self.env['file.msg'].create({'pop_up': 'Please check your request and try again!'})
             return {
                 'name': _('Alert'),
                 'view_type': 'form',
