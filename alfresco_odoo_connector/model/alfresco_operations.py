@@ -38,11 +38,9 @@ class AlfrescoOperations(models.Model):
                 new_ticket = json.loads(response.text)
                 ticket = new_ticket['entry']['id']
                 self.alf_ticket = ticket
-
-            auth_token = base64.b64encode(str(self.alf_ticket).encode('utf-8')).decode()
-
-            if auth_token:
-                self.alf_encoded_ticket = auth_token
+                auth_token = base64.b64encode(str(self.alf_ticket).encode('utf-8')).decode()
+                if auth_token:
+                    self.alf_encoded_ticket = auth_token
 
                 wiz_ob = self.env['pop.auth'].create(
                     {'pop_up': 'Your Ticket' + " " + '*' + self.alf_ticket + '*' + " " + 'has been generated.'})
@@ -103,20 +101,31 @@ class AlfrescoOperations(models.Model):
         response = requests.get(repo_url, headers=token_headers)
         if response.status_code == 200:
             response_text = json.loads(response.text)
-            wiz_ob = self.env['pop.messages'].create(
-                {'popup_edition': 'Edition: ' + response_text['entry']['repository']['edition'],
-                 'popup_version': 'Version: ' + 'v' + response_text['entry']['repository']['version']['major'] + '.' +
-                                  response_text['entry']['repository']['version']['minor'] + '.' +
-                                  response_text['entry']['repository']['version']['patch'] + '.' +
-                                  response_text['entry']['repository']['version']['hotfix'],
-                 'popup_license': 'License: ' + response_text['entry']['repository']['license']['holder'],
-                 'popup_license_issued_at': 'Issued At: ' + response_text['entry']['repository']['license'][
-                     'issuedAt'],
-                 'popup_license_issued_till': 'Issued Till: ' + response_text['entry']['repository']['license'][
-                     'expiresAt'],
-                 'popup_license_days': 'Remaining Days: ' + str(
-                     response_text['entry']['repository']['license']['remainingDays'])
-                 })
+            if response_text['entry']['repository']['edition'] == 'Community':
+                wiz_ob = self.env['pop.messages'].create(
+                    {'popup_edition': 'Edition: ' + response_text['entry']['repository']['edition'],
+                     'popup_version': 'Version: ' + 'v' + response_text['entry']['repository']['version'][
+                         'major'] + '.' +
+                                      response_text['entry']['repository']['version']['minor'] + '.' +
+                                      response_text['entry']['repository']['version']['patch'] + '.' +
+                                      response_text['entry']['repository']['version']['hotfix'],
+                     })
+            else:
+                wiz_ob = self.env['pop.messages'].create(
+                    {'popup_edition': 'Edition: ' + response_text['entry']['repository']['edition'],
+                     'popup_version': 'Version: ' + 'v' + response_text['entry']['repository']['version'][
+                         'major'] + '.' +
+                                      response_text['entry']['repository']['version']['minor'] + '.' +
+                                      response_text['entry']['repository']['version']['patch'] + '.' +
+                                      response_text['entry']['repository']['version']['hotfix'],
+                     'popup_license': 'License: ' + response_text['entry']['repository']['license']['holder'],
+                     'popup_license_issued_at': 'Issued At: ' + response_text['entry']['repository']['license'][
+                         'issuedAt'],
+                     'popup_license_issued_till': 'Issued Till: ' + response_text['entry']['repository']['license'][
+                         'expiresAt'],
+                     'popup_license_days': 'Remaining Days: ' + str(
+                         response_text['entry']['repository']['license']['remainingDays'])
+                     })
             return {
                 'name': _('Repository Information'),
                 'view_type': 'form',

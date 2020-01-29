@@ -28,6 +28,7 @@ class PopUpFolder(models.TransientModel):
     _name = 'pop.folder'
 
     pop_up = fields.Char("Pop Up", readonly=True)
+    pop_up_folder = fields.Char("Pop Up Folder", readonly=True)
 
 
 class PopUpFileCreateMsg(models.TransientModel):

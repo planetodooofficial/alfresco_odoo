@@ -64,7 +64,8 @@ class Manage_Files_Folders(models.TransientModel):
 
             # This Wizard is use to display the information which we are getting in Response.
 
-            wiz_ob = self.env['pop.folder'].create({'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "been created"})
+            wiz_ob = self.env['pop.folder'].create(
+                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "been created"})
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -141,7 +142,8 @@ class Manage_Files_Folders(models.TransientModel):
 
             # This Wizard is use to display the information which we are getting in Response.
 
-            wiz_ob = self.env['pop.folder'].create({'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "has been updated"})
+            wiz_ob = self.env['pop.folder'].create(
+                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "has been updated"})
             return {
                 'name': _('Manage Folder'),
                 'view_type': 'form',
@@ -173,7 +175,7 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100&include=id'
 
         headers = {
             'Accept': 'application/json',
@@ -184,62 +186,80 @@ class Manage_Files_Folders(models.TransientModel):
         list_content = json.loads(response.text)
         if response.status_code == 200:
 
-            # This Wizard is use to display the information which we are getting in Response.
+            folder_search = self.env['folder.details'].search([])
 
-            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': list_content['list']['pagination']['totalItems']})
-            return {
-                'name': _('Content of Repository'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.list.content',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
-        else:
-            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Please check your request and try again!'})
-            return {
-                'name': _('Content of Repository'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.list.content',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
+            folder_list = []
 
-    def filter_contents_of_folder(self):
-        """This function will list the contents of a folder in the repository"""
+            for folder in folder_search:
+                for folders in list_content['list']['entries']:
+                    if list_content['list']['entries'] == ['Data Dictionary', 'Guest Home', 'Imap Attachments',
+                                                           'IMAP Home',
+                                                           'Shared', 'Sites', 'User Homes']:
+                        pass
+                    elif folders['entry']['id'] == folder.folder_id:
+                        pass
+                    else:
+                        folder_list.append(folder)
 
-        ticket = self.env['alfresco.operations'].search([], limit=1)
+            # for lst in folder_list:
+            #     lst.unlink()
 
-        base_url = ticket.alf_base_url + "/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
+        # This Wizard is use to display the information which we are getting in Response.
 
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
-        }
+        #     wiz_ob = self.env['pop.list.content'].create({'popup_list_content': list_content['list']['pagination']['totalItems']})
+        #     return {
+        #         'name': _('Content of Repository'),
+        #         'view_type': 'form',
+        #         'view_mode': 'form',
+        #         'res_model': 'pop.list.content',
+        #         'res_id': wiz_ob.id,
+        #         'view_id': False,
+        #         'target': 'new',
+        #         'views': False,
+        #         'type': 'ir.actions.act_window',
+        #     }
+        # else:
+        #     wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Please check your request and try again!'})
+        #     return {
+        #         'name': _('Content of Repository'),
+        #         'view_type': 'form',
+        #         'view_mode': 'form',
+        #         'res_model': 'pop.list.content',
+        #         'res_id': wiz_ob.id,
+        #         'view_id': False,
+        #         'target': 'new',
+        #         'views': False,
+        #         'type': 'ir.actions.act_window',
+        #     }
 
-        response = requests.get(base_url, headers=headers)
+    # def filter_contents_of_folder(self):
+    #     """This function will list the contents of a folder in the repository"""
+    #
+    #     ticket = self.env['alfresco.operations'].search([], limit=1)
+    #
+    #     base_url = ticket.alf_base_url + "/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
+    #
+    #     headers = {
+    #         'Accept': 'application/json',
+    #         'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
+    #     }
+    #
+    #     response = requests.get(base_url, headers=headers)
 
-    def get_folder_file_metadata(self):
-        """Getting the metadata for a node returns the properties for the node type and applied aspects."""
-
-        ticket = self.env['alfresco.operations'].search([], limit=1)
-
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
-
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
-        }
-
-        response = requests.get(base_url, headers=headers)
-        print(json.loads(response.text))
+    # def get_folder_file_metadata(self):
+    #     """Getting the metadata for a node returns the properties for the node type and applied aspects."""
+    #
+    #     ticket = self.env['alfresco.operations'].search([], limit=1)
+    #
+    #     base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
+    #
+    #     headers = {
+    #         'Accept': 'application/json',
+    #         'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+    #     }
+    #
+    #     response = requests.get(base_url, headers=headers)
+    #     print(json.loads(response.text))
 
     def upload_file(self):
         """Uploading a file to the Repository means creating a node with metadata and content."""

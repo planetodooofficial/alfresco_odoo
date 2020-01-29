@@ -18,7 +18,7 @@
                     </group>
                     <footer>
                         <button name="create_folder" string="Create Folder" type="object" class="oe_highlight"/>
-                        <!--                        <button name="list_contents_for_folders" string="List Content" type="object" class="oe_highlight"/>-->
+                        <button name="list_contents_for_folders" string="List Content" type="object" class="oe_highlight"/>
                         <!--                        <button name="filter_contents_of_folder" string="Filter Content" type="object" class="oe_highlight"/>-->
                         <!--                        <button name="get_folder_file_metadata" string="Get Metadata" type="object" class="oe_highlight"/>-->
                         <button string="Cancel" class="btn-default" special="cancel"/>
@@ -112,6 +112,20 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="files_form_id"/>
             <field name="target">new</field>
+        </record>
+
+        <!--        Folder Updates Using Cron-->
+
+        <record id="cron_do_folder_update" forcecreate='True' model="ir.cron">
+            <field name="name">Folder Update</field>
+            <field eval="False" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="model_id" ref="model_alfresco_files_folder"/>
+            <field name="state">code</field>
+            <field name="code">model.list_contents_for_folders()</field>
         </record>
 
         <menuitem id="sub_menu_upload_file" name="Upload Files"
