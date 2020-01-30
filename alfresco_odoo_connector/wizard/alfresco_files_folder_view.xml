@@ -56,6 +56,7 @@
                     </group>
                     <footer>
                         <button name="update_folder" string="Update Folder" type="object" class="oe_highlight"/>
+                        <button name="update_folder_cron" string="Update Folder List" type="object" class="oe_highlight"/>
                         <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
@@ -118,10 +119,10 @@
 
         <record id="cron_do_folder_update" forcecreate='True' model="ir.cron">
             <field name="name">Folder Update</field>
-            <field eval="False" name="active"/>
+            <field eval="True" name="active"/>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">5</field>
-            <field name="interval_type">minutes</field>
+            <field name="interval_number">12</field>
+            <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="model_id" ref="model_alfresco_files_folder"/>
             <field name="state">code</field>

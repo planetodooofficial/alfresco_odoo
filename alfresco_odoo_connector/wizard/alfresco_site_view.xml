@@ -52,6 +52,7 @@
                     </group>
                     <footer>
                         <button name="update_site" string="Update Site" type="object" class="oe_highlight"/>
+                        <button name="update_site_cron" string="Update Site List" type="object" class="oe_highlight"/>
                         <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
@@ -101,6 +102,21 @@
             <field name="view_id" ref="sites_content_id"/>
             <field name="target">new</field>
         </record>
+
+        <!--        Site Update using CRON-->
+
+        <record id="cron_do_site_update" forcecreate='True' model="ir.cron">
+            <field name="name">Site Update</field>
+            <field eval="True" name="active"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">12</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="model_id" ref="model_manage_sites"/>
+            <field name="state">code</field>
+            <field name="code">model.update_site_cron()</field>
+        </record>
+
 
         <menuitem id="menu_manage_sites" name="Sites" parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
         <menuitem id="sub_menu_create_sites" name="Create Sites" action="action_manage_sites" parent="alfresco_odoo_connector.menu_manage_sites"/>

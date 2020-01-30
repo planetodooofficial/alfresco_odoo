@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _, tools
+from odoo.exceptions import UserError, ValidationError
 import base64
 import logging
 import requests
@@ -123,11 +124,13 @@ class Manage_Files_Folders(models.TransientModel):
         }
 
         headers = {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
+            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + folder.folder_id
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            folder.folder_id)
 
         response = requests.put(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 200:
@@ -170,12 +173,13 @@ class Manage_Files_Folders(models.TransientModel):
                 'type': 'ir.actions.act_window',
             }
 
-    def list_contents_for_folders(self):
+    def update_folder_cron(self):
         """This function will list all the content of the folder in the Repository"""
+        """Also It will be used in the CRON to update the folder list in Odoo Database with folder list in Alfresco Repository"""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100&include=id'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100&include=id&orderBy=name ASC'
 
         headers = {
             'Accept': 'application/json',
@@ -185,52 +189,30 @@ class Manage_Files_Folders(models.TransientModel):
         response = requests.get(base_url, headers=headers)
         list_content = json.loads(response.text)
         if response.status_code == 200:
-
             folder_search = self.env['folder.details'].search([])
-
             folder_list = []
-
-            for folder in folder_search:
-                for folders in list_content['list']['entries']:
-                    if list_content['list']['entries'] == ['Data Dictionary', 'Guest Home', 'Imap Attachments',
-                                                           'IMAP Home',
-                                                           'Shared', 'Sites', 'User Homes']:
-                        pass
-                    elif folders['entry']['id'] == folder.folder_id:
-                        pass
-                    else:
-                        folder_list.append(folder)
-
-            # for lst in folder_list:
-            #     lst.unlink()
-
-        # This Wizard is use to display the information which we are getting in Response.
-
-        #     wiz_ob = self.env['pop.list.content'].create({'popup_list_content': list_content['list']['pagination']['totalItems']})
-        #     return {
-        #         'name': _('Content of Repository'),
-        #         'view_type': 'form',
-        #         'view_mode': 'form',
-        #         'res_model': 'pop.list.content',
-        #         'res_id': wiz_ob.id,
-        #         'view_id': False,
-        #         'target': 'new',
-        #         'views': False,
-        #         'type': 'ir.actions.act_window',
-        #     }
-        # else:
-        #     wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Please check your request and try again!'})
-        #     return {
-        #         'name': _('Content of Repository'),
-        #         'view_type': 'form',
-        #         'view_mode': 'form',
-        #         'res_model': 'pop.list.content',
-        #         'res_id': wiz_ob.id,
-        #         'view_id': False,
-        #         'target': 'new',
-        #         'views': False,
-        #         'type': 'ir.actions.act_window',
-        #     }
+            content = list_content['list']['entries']
+            for i in content:
+                folder_list.append(i['entry']['id'])
+            if folder_search:
+                for folder in folder_search:
+                    if folder.folder_id not in folder_list:
+                        folder.unlink()
+                        self._cr.commit()
+            else:
+                raise (_("There bo folders in the repository"))
+            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.list.content',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
 
     # def filter_contents_of_folder(self):
     #     """This function will list the contents of a folder in the repository"""

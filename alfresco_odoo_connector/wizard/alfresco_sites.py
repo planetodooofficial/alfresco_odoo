@@ -178,67 +178,104 @@ class ManagingSites(models.TransientModel):
                 'type': 'ir.actions.act_window',
             }
 
-    def add_content_to_site(self):
-        """This function Creates folders and add files to an Alfresco Share site's Document Library."""
+    # def add_content_to_site(self):
+    #     """This function Creates folders and add files to an Alfresco Share site's Document Library."""
+    #
+    #     ticket = self.env['alfresco.operations'].search([], limit=1)
+    #
+    #     sites = self.env['sites.details'].search([('name', '=', self.alf_site_search.name)])
+    #
+    #     document_lib_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/sites/' + sites.site_id + '/containers/documentLibrary'
+    #
+    #     document_lib_headers = {
+    #         'Accept': 'application/json',
+    #         'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+    #     }
+    #
+    #     response_doc = requests.get(document_lib_url, headers=document_lib_headers)
+    #     data_doc = json.loads(response_doc.text)
+    #     if response_doc.status_code == 200:
+    #
+    #         # This is to check if the site exist. If the folder exist, it will write the new name of the site
+    #         # if the site is not there, it will create a new record with the respective site name.
+    #
+    #         existing_site = self.env['sites.details'].search([('site_id', '=', sites.site_id)])
+    #         existing_site.write({'name': sites.name,
+    #                              'site_id': sites.site_id,
+    #                              'site_document_id': data_doc['entry']['id']})
+    #
+    #     url = ticket.alf_base_url + '/api/-default-/public/alfresco/versions/1/nodes/' + str(
+    #         sites.site_document_id) + '/children'
+    #
+    #     headers = {
+    #         'Content-Type': 'application/json',
+    #         'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+    #     }
+    #
+    #     datas = {
+    #         "name": "My" + " " + sites.name + " " + "Stuff",
+    #         "nodeType": "cm:folder"
+    #     }
+    #
+    #     response_entry = requests.post(url, data=json.dumps(datas), headers=headers)
+    #     data = json.loads(response_entry.text)
+    #     site_folder_id = False
+    #     if response_entry.status_code == 200:
+    #         site_folder_id = data['entry']['id']
+    #
+    #     data_file = base64.b64decode(self.alf_site_upload_content)
+    #
+    #     site_url = ticket.alf_base_url + '/api/-default-/public/alfresco/versions/1/nodes/' + site_folder_id + '/children'
+    #
+    #     file_header = {
+    #         'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+    #     }
+    #
+    #     files = {
+    #         'filedata': data_file,
+    #         'name': (None, self.alf_site_file_name),
+    #         'nodeType': (None, 'cm:content'),
+    #     }
+    #
+    #     response = requests.post(site_url, headers=file_header, files=files)
+    #     print(response)
+
+    def update_site_cron(self):
+        """This function update Sites in Odoo Database with sites from Alfresco Repository."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
 
-        sites = self.env['sites.details'].search([('name', '=', self.alf_site_search.name)])
-
-        document_lib_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/sites/' + sites.site_id + '/containers/documentLibrary'
-
-        document_lib_headers = {
-            'Accept': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
-        }
-
-        response_doc = requests.get(document_lib_url, headers=document_lib_headers)
-        data_doc = json.loads(response_doc.text)
-        if response_doc.status_code == 200:
-
-            # This is to check if the site exist. If the folder exist, it will write the new name of the site
-            # if the site is not there, it will create a new record with the respective site name.
-
-            existing_site = self.env['sites.details'].search([('site_id', '=', sites.site_id)])
-            existing_site.write({'name': sites.name,
-                                 'site_id': sites.site_id,
-                                 'site_document_id': data_doc['entry']['id']})
-
-        url = ticket.alf_base_url + '/api/-default-/public/alfresco/versions/1/nodes/' + str(
-            sites.site_document_id) + '/children'
+        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/sites'
 
         headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+            'Accept': 'application/json',
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        datas = {
-            "name": "My" + " " + sites.name + " " + "Stuff",
-            "nodeType": "cm:folder"
-        }
-
-        response_entry = requests.post(url, data=json.dumps(datas), headers=headers)
-        data = json.loads(response_entry.text)
-        site_folder_id = False
-        if response_entry.status_code == 200:
-            site_folder_id = data['entry']['id']
-
-        data_file = base64.b64decode(self.alf_site_upload_content)
-
-        site_url = ticket.alf_base_url + '/api/-default-/public/alfresco/versions/1/nodes/' + site_folder_id + '/children'
-
-        file_header = {
-            'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
-        }
-
-        files = {
-            'filedata': data_file,
-            'name': (None, self.alf_site_file_name),
-            'nodeType': (None, 'cm:content'),
-        }
-
-        response = requests.post(site_url, headers=file_header, files=files)
-        print(response)
-
-    def add_members_to_site(self):
-        """This function add members to an Alfresco Share site."""
+        response = requests.get(base_url, headers=headers)
+        list_content = json.loads(response.text)
+        if response.status_code == 200:
+            site_search = self.env['sites.details'].search([])
+            site_list = []
+            content = list_content['list']['entries']
+            for i in content:
+                site_list.append(i['entry']['id'])
+            if site_search:
+                for site in site_search:
+                    if site.site_id not in site_list:
+                        site.unlink()
+                        self._cr.commit()
+            else:
+                raise (_("There are no sites in the repository"))
+            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Site List Updated Successfully!'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.list.content',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
