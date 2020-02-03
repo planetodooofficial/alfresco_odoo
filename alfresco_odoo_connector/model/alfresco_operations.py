@@ -11,8 +11,8 @@ class AlfrescoOperations(models.Model):
     _name = 'alfresco.operations'
     _rec_name = 'alf_username'
 
-    alf_username = fields.Char("User ID")
-    alf_password = fields.Char("Password")
+    alf_username = fields.Char("User ID", store=True)
+    alf_password = fields.Char("Password", store=True)
     alf_ticket = fields.Char("Alfresco Ticket", readonly=True, store=True)
     alf_encoded_ticket = fields.Char("Alfresco Token", readonly=True, store=True)
     alf_base_url = fields.Char("Alfresco URL", store=True)
@@ -28,7 +28,7 @@ class AlfrescoOperations(models.Model):
         }
 
         try:
-            auth_url = self.alf_base_url + '/alfresco/api/-default-/public/authentication/versions/1/tickets'
+            auth_url = self.alf_base_url + 'alfresco/api/-default-/public/authentication/versions/1/tickets'
             ticket_headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Basic'
@@ -57,7 +57,7 @@ class AlfrescoOperations(models.Model):
                 }
             elif response.status_code == 403:
                 wiz_ob = self.env['pop.auth'].create(
-                    {'pop_up': 'Login Failed! Please try again.'})
+                    {'pop_up': 'Login Failed! Please check your Username & Password.'})
                 return {
                     'name': _('Authentication'),
                     'view_type': 'form',
@@ -91,7 +91,7 @@ class AlfrescoOperations(models.Model):
 
         """This function is use to Get the information of the Alfresco Repository"""
 
-        repo_url = self.alf_base_url + '/alfresco/api/discovery'
+        repo_url = self.alf_base_url + 'alfresco/api/discovery'
 
         token_headers = {
             'Accept': 'application/json',

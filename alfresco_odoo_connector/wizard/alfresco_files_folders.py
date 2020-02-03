@@ -39,8 +39,9 @@ class Manage_Files_Folders(models.TransientModel):
         """This function is to create folders in your root directory."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
+        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         datas = {
             "name": self.alf_folder_name,
@@ -110,6 +111,7 @@ class Manage_Files_Folders(models.TransientModel):
         """This function is to update folder name in your root directory."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
 
         folder = self.env['folder.details'].search([('name', '=', self.alf_search_folder.name)])
 
@@ -129,7 +131,7 @@ class Manage_Files_Folders(models.TransientModel):
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
         }
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
             folder.folder_id)
 
         response = requests.put(base_url, data=json.dumps(datas), headers=headers)
@@ -178,8 +180,9 @@ class Manage_Files_Folders(models.TransientModel):
         """Also It will be used in the CRON to update the folder list in Odoo Database with folder list in Alfresco Repository"""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100&include=id&orderBy=name ASC'
+        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100&include=id&orderBy=name ASC'
 
         headers = {
             'Accept': 'application/json',
@@ -218,8 +221,9 @@ class Manage_Files_Folders(models.TransientModel):
     #     """This function will list the contents of a folder in the repository"""
     #
     #     ticket = self.env['alfresco.operations'].search([], limit=1)
+    #     ticket.get_auth_token_header()
     #
-    #     base_url = ticket.alf_base_url + "/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
+    #     base_url = ticket.alf_base_url + "alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
     #
     #     headers = {
     #         'Accept': 'application/json',
@@ -232,8 +236,9 @@ class Manage_Files_Folders(models.TransientModel):
     #     """Getting the metadata for a node returns the properties for the node type and applied aspects."""
     #
     #     ticket = self.env['alfresco.operations'].search([], limit=1)
+    #     ticket.get_auth_token_header()
     #
-    #     base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
+    #     base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
     #
     #     headers = {
     #         'Accept': 'application/json',
@@ -247,8 +252,9 @@ class Manage_Files_Folders(models.TransientModel):
         """Uploading a file to the Repository means creating a node with metadata and content."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
 
-        base_url = ticket.alf_base_url + '/alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
+        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         headers = {
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
