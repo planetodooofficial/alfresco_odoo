@@ -73,13 +73,6 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem id="menu_file_folder" name="Files &amp; Folder"
-                  parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
-        <menuitem id="sub_menu_create_folder" name="Create Folder"
-                  action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder" sequence="1"/>
-        <menuitem id="sub_menu_update_folder" name="Update Folder"
-                  action="action_folder_update" parent="alfresco_odoo_connector.menu_file_folder" sequence="2"/>
-
         <!--        Upload Files-->
 
         <record id="files_form_id" model="ir.ui.view">
@@ -129,6 +122,16 @@
             <field name="code">model.list_contents_for_folders()</field>
         </record>
 
+        <!--        Menu for Files and Folder-->
+        <menuitem id="menu_file_folder" name="Files &amp; Folder"
+                  parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
+        <!--        Sub Menu for Create Folder-->
+        <menuitem id="sub_menu_create_folder" name="Create Folder"
+                  action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder" sequence="1"/>
+        <!--        Sub Menu for Update Folder-->
+        <menuitem id="sub_menu_update_folder" name="Update Folder"
+                  action="action_folder_update" parent="alfresco_odoo_connector.menu_file_folder" sequence="2"/>
+        <!--        Sub Menu for Upload Files-->
         <menuitem id="sub_menu_upload_file" name="Upload Files"
                   action="action_files" parent="alfresco_odoo_connector.menu_file_folder" sequence="3"/>
     </data>
