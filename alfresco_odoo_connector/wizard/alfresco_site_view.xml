@@ -78,11 +78,11 @@
                 <form string="Content to Alfresco Share Site">
                     <group>
                         <group>
-                            <field name="alf_site_search" filename="alf_site_file_name"/>
+                            <field name="alf_site_search"/>
                             <field name="alf_site_file_name" invisible="1"/>
                         </group>
                         <group>
-                            <field name="alf_site_upload_content"/>
+                            <field name="alf_site_upload_content" filename="alf_site_file_name"/>
                         </group>
                     </group>
                     <footer>

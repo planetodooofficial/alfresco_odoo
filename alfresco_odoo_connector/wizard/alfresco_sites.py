@@ -129,7 +129,6 @@ class ManagingSites(models.TransientModel):
         response = requests.put(url, data=json.dumps(datas), headers=headers)
         data = json.loads(response.text)
         if response.status_code == 200:
-
             # This is to check if the site exist. If the folder exist, it will write the new name of the site
             # if the site is not there, it will create a new record with the respective site name.
 
@@ -220,15 +219,25 @@ class ManagingSites(models.TransientModel):
             "nodeType": "cm:folder"
         }
 
-        response_entry = requests.post(url, data=json.dumps(datas), headers=headers)
-        data = json.loads(response_entry.text)
+        result = requests.get(url, headers=headers)
+        result_text = json.loads(result.text)
+        data = result_text['list']['entries'][0]['entry']['id']
+
         site_folder_id = False
-        if response_entry.status_code == 200:
-            site_folder_id = data['entry']['id']
+
+        if data:
+            if result.status_code == 200:
+                site_folder_id = result_text['list']['entries'][0]['entry']['id']
+        else:
+            response_entry = requests.post(url, data=json.dumps(datas), headers=headers)
+            data_post = json.loads(response_entry.text)
+            if response_entry.status_code == 201:
+                site_folder_id = data_post['entry']['id']
 
         data_file = base64.b64decode(self.alf_site_upload_content)
 
-        site_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + site_folder_id + '/children'
+        site_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            site_folder_id if site_folder_id else data) + '/children'
 
         file_header = {
             'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
@@ -240,8 +249,21 @@ class ManagingSites(models.TransientModel):
             'nodeType': (None, 'cm:content'),
         }
 
-        response = requests.post(site_url, headers=file_header, files=files)
-        print(response)
+        response_upload_content = requests.post(site_url, headers=file_header, files=files)
+        if response_upload_content.status_code == 201:
+            wiz_ob = self.env['site'].create({'pop_up': 'Your content has been uploaded on the selected site'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'site',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+
 
     def update_site_cron(self):
         """This function update Sites in Odoo Database with sites from Alfresco Repository."""
