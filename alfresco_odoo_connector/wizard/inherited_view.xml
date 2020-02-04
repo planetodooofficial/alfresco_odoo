@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!--ALFRESCO MENU FROM SALE ORDER-->
+
+        <!--       Alfresco Files and Folders-->
+
+        <menuitem id="sales_menu_file_folder" name="Alfresco Files &amp; Folder"
+                  parent="sale.sale_menu_root" groups="base.group_user"/>
+
+        <!--        Sub Menu for Create Folder-->
+        <menuitem id="sub_sale_menu_create_folder" name="Create Folder"
+                  action="alfresco_odoo_connector.action_files_folder" parent="alfresco_odoo_connector.sales_menu_file_folder"
+                  sequence="1"/>
+        <!--        Sub Menu for Update Folder-->
+        <menuitem id="sub_sale_menu_update_folder" name="Update Folder"
+                  action="alfresco_odoo_connector.action_folder_update" parent="alfresco_odoo_connector.sales_menu_file_folder"
+                  sequence="2"/>
+        <!--        Sub Menu for Upload Files-->
+        <menuitem id="sub_sale_menu_upload_file" name="Upload Files"
+                  action="alfresco_odoo_connector.action_files" parent="alfresco_odoo_connector.sales_menu_file_folder"
+                  sequence="3"/>
+
+
+        <!--        Alfresco Sites-->
+
+        <menuitem id="sale_menu_manage_sites" name="Alfresco Sites"
+                  parent="sale.sale_menu_root" groups="base.group_user"/>
+
+        <!--        Sites Sub Menu to Create Site-->
+        <menuitem id="sub_sale_menu_create_sites" name="Create Sites" action="alfresco_odoo_connector.action_manage_sites"
+                  parent="alfresco_odoo_connector.sale_menu_manage_sites" sequence="1"/>
+        <!--        Sites Sub Menu to Update Site-->
+        <menuitem id="sub_sale_menu_update_sites" name="Update Sites" action="alfresco_odoo_connector.action_update_sites"
+                  parent="alfresco_odoo_connector.sale_menu_manage_sites" sequence="2"/>
+        <!--        Sites Sub Menu to Add Content To Site-->
+        <menuitem id="sub_sale_menu_content_to_sites" name="Add Content To Site" action="alfresco_odoo_connector.action_add_content_sites"
+                  parent="alfresco_odoo_connector.sale_menu_manage_sites" sequence="3"/>
+
+    </data>
+</odoo>
