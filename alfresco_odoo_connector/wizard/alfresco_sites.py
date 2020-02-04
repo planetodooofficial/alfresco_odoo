@@ -35,6 +35,11 @@ class ManagingSites(models.TransientModel):
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/sites'
 
         datas = {
@@ -108,6 +113,11 @@ class ManagingSites(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
+
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
 
         sites = self.env['sites.details'].search([('name', '=', self.alf_site_search.name)])
 
@@ -184,6 +194,11 @@ class ManagingSites(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
+
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
 
         sites = self.env['sites.details'].search([('name', '=', self.alf_site_search.name)])
 
@@ -264,12 +279,16 @@ class ManagingSites(models.TransientModel):
                 'type': 'ir.actions.act_window',
             }
 
-
     def update_site_cron(self):
         """This function update Sites in Odoo Database with sites from Alfresco Repository."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
+
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
 
         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/sites'
 

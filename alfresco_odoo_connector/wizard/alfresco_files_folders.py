@@ -41,6 +41,11 @@ class Manage_Files_Folders(models.TransientModel):
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         datas = {
@@ -113,6 +118,11 @@ class Manage_Files_Folders(models.TransientModel):
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
         folder = self.env['folder.details'].search([('name', '=', self.alf_search_folder.name)])
 
         datas = {
@@ -182,6 +192,11 @@ class Manage_Files_Folders(models.TransientModel):
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?fields=nodeType,name&skipCount=0&maxItems=100&include=id&orderBy=name ASC'
 
         headers = {
@@ -222,6 +237,11 @@ class Manage_Files_Folders(models.TransientModel):
     #
     #     ticket = self.env['alfresco.operations'].search([], limit=1)
     #     ticket.get_auth_token_header()
+
+    # if ticket.alf_encoded_ticket:
+    #     pass
+    # else:
+    #     raise ValidationError(_("Please Login!!!"))
     #
     #     base_url = ticket.alf_base_url + "alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
     #
@@ -237,6 +257,10 @@ class Manage_Files_Folders(models.TransientModel):
     #
     #     ticket = self.env['alfresco.operations'].search([], limit=1)
     #     ticket.get_auth_token_header()
+    # if ticket.alf_encoded_ticket:
+    #     pass
+    # else:
+    #     raise ValidationError(_("Please Login!!!"))
     #
     #     base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
     #
@@ -253,6 +277,11 @@ class Manage_Files_Folders(models.TransientModel):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
+
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
 
         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 

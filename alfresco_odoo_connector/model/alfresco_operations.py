@@ -1,4 +1,6 @@
 from odoo import api, fields, models, _, tools
+from odoo.exceptions import UserError, ValidationError
+
 import base64
 import logging
 import requests
@@ -27,8 +29,11 @@ class AlfrescoOperations(models.Model):
             "password": self.alf_password
         }
 
+        if self.alf_base_url is False:
+            raise ValidationError(_("Please Login to generate TICKET."))
+
         try:
-            auth_url = self.alf_base_url + 'alfresco/api/-default-/public/authentication/versions/1/tickets'
+            auth_url = str(self.alf_base_url) + 'alfresco/api/-default-/public/authentication/versions/1/tickets'
             ticket_headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Basic'
@@ -91,7 +96,7 @@ class AlfrescoOperations(models.Model):
 
         """This function is use to Get the information of the Alfresco Repository"""
 
-        repo_url = self.alf_base_url + 'alfresco/api/discovery'
+        repo_url = str(self.alf_base_url) + 'alfresco/api/discovery'
 
         token_headers = {
             'Accept': 'application/json',
