@@ -19,12 +19,12 @@ class Sites(models.Model):
 class ManagingSites(models.TransientModel):
     _name = 'manage.sites'
 
-    alf_site_name = fields.Char("Site Name")
+    alf_site_name = fields.Char("Site Name", required=True)
     alf_site_description = fields.Char("Site Description")
     alf_site_visibility = fields.Selection([('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE'), ('MODERATED', 'MODERATED')],
-                                           string="Site Visibility")
+                                           string="Site Visibility", required=True)
 
-    alf_site_search = fields.Many2one('sites.details', string="Select Site")
+    alf_site_search = fields.Many2one('sites.details', string="Select Site", required=True)
 
     alf_site_upload_content = fields.Binary(string='Upload Content')
     alf_site_file_name = fields.Char("File Name")
@@ -195,6 +195,9 @@ class ManagingSites(models.TransientModel):
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
+        site_folder_id = False
+        data = False
+
         if ticket.alf_encoded_ticket:
             pass
         else:
@@ -236,9 +239,8 @@ class ManagingSites(models.TransientModel):
 
         result = requests.get(url, headers=headers)
         result_text = json.loads(result.text)
-        data = result_text['list']['entries'][0]['entry']['id']
-
-        site_folder_id = False
+        if result_text['list']['pagination']['count'] >= 1:
+            data = result_text['list']['entries'][0]['entry']['id']
 
         if data:
             if result.status_code == 200:

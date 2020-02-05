@@ -18,9 +18,6 @@
                     </group>
                     <footer>
                         <button name="create_folder" string="Create Folder" type="object" class="oe_highlight"/>
-                        <button name="list_contents_for_folders" string="List Content" type="object" class="oe_highlight"/>
-                        <!--                        <button name="filter_contents_of_folder" string="Filter Content" type="object" class="oe_highlight"/>-->
-                        <!--                        <button name="get_folder_file_metadata" string="Get Metadata" type="object" class="oe_highlight"/>-->
                         <button string="Cancel" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
