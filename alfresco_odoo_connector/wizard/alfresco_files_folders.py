@@ -218,7 +218,7 @@ class Manage_Files_Folders(models.TransientModel):
                         folder.unlink()
                         self._cr.commit()
             else:
-                raise ValidationError(_("There bo folders in the repository"))
+                raise ValidationError(_("There no folders in the repository"))
             wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
             return {
                 'name': _('Alert'),
