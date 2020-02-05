@@ -1,6 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_alfresco_operations,alfresco.operations,model_alfresco_operations,base.group_user,1,1,1,1
 access_alfresco_files_folder,alfresco.files.folder,model_alfresco_files_folder,base.group_user,1,1,1,1
-access_manage_sites,manage.sites,model_manage_sites,base.group_user,1,1,1,1
 access_folder_details,folder.details,model_folder_details,base.group_user,1,1,1,1
 access_sites_details,sites.details,model_sites_details,base.group_user,1,1,1,1
+access_manage_sites,manage.sites,model_manage_sites,base.group_user,1,1,1,1
+
