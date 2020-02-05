@@ -186,7 +186,7 @@ class Manage_Files_Folders(models.TransientModel):
             }
 
     def update_folder_cron(self):
-        """This function will list all the content of the folder in the Repository"""
+        """This function will list all the folder in the Repository"""
         """Also It will be used in the CRON to update the folder list in Odoo Database with folder list in Alfresco Repository"""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
@@ -218,7 +218,7 @@ class Manage_Files_Folders(models.TransientModel):
                         folder.unlink()
                         self._cr.commit()
             else:
-                raise (_("There bo folders in the repository"))
+                raise ValidationError(_("There bo folders in the repository"))
             wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
             return {
                 'name': _('Alert'),

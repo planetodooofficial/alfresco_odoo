@@ -311,7 +311,7 @@ class ManagingSites(models.TransientModel):
                         site.unlink()
                         self._cr.commit()
             else:
-                raise (_("There are no sites in the repository"))
+                raise ValidationError(_("There are no sites in the repository"))
             wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Site List Updated Successfully!'})
             return {
                 'name': _('Alert'),
