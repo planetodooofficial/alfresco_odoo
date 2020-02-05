@@ -11,7 +11,7 @@
                 <form string="Create Folder">
                     <group>
                         <group>
-                            <field name="alf_folder_name"/>
+                            <field name="alf_folder_name" required="1"/>
                             <field name="alf_folder_title" placeholder="optional"/>
                             <field name="alf_folder_desc" placeholder="optional"/>
                         </group>
@@ -79,7 +79,7 @@
                 <form string="Uplaod File">
                     <group>
                         <group>
-                            <field name="alf_file" filename="alf_file_name"/>
+                            <field name="alf_file" filename="alf_file_name" required="1"/>
                             <field name="alf_folder_path" required="True" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
                             <field name="alf_file_title" placeholder="optional"/>
                             <field name="alf_file_description" placeholder="optional"/>
@@ -111,7 +111,7 @@
             <field name="name">Folder Update</field>
             <field eval="True" name="active"/>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">12</field>
+            <field name="interval_number">6</field>
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="model_id" ref="model_alfresco_files_folder"/>

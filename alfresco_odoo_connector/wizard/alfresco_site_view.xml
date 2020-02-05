@@ -10,7 +10,7 @@
                 <form string="Create Alfresco Share Site">
                     <group>
                         <group>
-                            <field name="alf_site_name"/>
+                            <field name="alf_site_name" required="1"/>
                             <field name="alf_site_description"/>
                             <field name="alf_site_visibility"/>
                         </group>
@@ -78,7 +78,7 @@
                 <form string="Content to Alfresco Share Site">
                     <group>
                         <group>
-                            <field name="alf_site_search"/>
+                            <field name="alf_site_search" required="1"/>
                             <field name="alf_site_file_name" invisible="1"/>
                         </group>
                         <group>

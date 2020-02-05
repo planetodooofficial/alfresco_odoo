@@ -23,17 +23,17 @@ class Manage_Files_Folders(models.TransientModel):
     _name = 'alfresco.files.folder'
     _rec_name = 'alf_folder_name'
 
-    alf_folder_name = fields.Char("Folder Name", required=True)
+    alf_folder_name = fields.Char("Folder Name")
     alf_folder_title = fields.Char("Folder Title")
     alf_folder_desc = fields.Char("Folder Description")
-    alf_folder_path = fields.Many2one('folder.details', string="Relative Path", required=True)
+    alf_folder_path = fields.Many2one('folder.details', string="Relative Path")
 
     alf_file = fields.Binary("Upload a File")
     alf_file_name = fields.Char("File Name")
     alf_file_title = fields.Char("File Title")
     alf_file_description = fields.Char("File Description")
 
-    alf_search_folder = fields.Many2one('folder.details', string="Select Folder", required=True)
+    alf_search_folder = fields.Many2one('folder.details', string="Select Folder")
 
     def create_folder(self):
         """This function is to create folders in your root directory."""

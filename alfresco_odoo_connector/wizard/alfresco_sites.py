@@ -19,12 +19,12 @@ class Sites(models.Model):
 class ManagingSites(models.TransientModel):
     _name = 'manage.sites'
 
-    alf_site_name = fields.Char("Site Name", required=True)
+    alf_site_name = fields.Char("Site Name")
     alf_site_description = fields.Char("Site Description")
     alf_site_visibility = fields.Selection([('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE'), ('MODERATED', 'MODERATED')],
-                                           string="Site Visibility", required=True)
+                                           string="Site Visibility")
 
-    alf_site_search = fields.Many2one('sites.details', string="Select Site", required=True)
+    alf_site_search = fields.Many2one('sites.details', string="Select Site")
 
     alf_site_upload_content = fields.Binary(string='Upload Content')
     alf_site_file_name = fields.Char("File Name")
@@ -160,7 +160,7 @@ class ManagingSites(models.TransientModel):
                 'views': False,
                 'type': 'ir.actions.act_window',
             }
-        if response.status_code == 401:
+        elif response.status_code == 401:
             wiz_ob = self.env['site'].create(
                 {'pop_up': 'Authentication failed.'})
             return {
@@ -174,9 +174,23 @@ class ManagingSites(models.TransientModel):
                 'views': False,
                 'type': 'ir.actions.act_window',
             }
-        if response.status_code == 404:
+        elif response.status_code == 404:
             wiz_ob = self.env['site'].create(
                 {'pop_up': 'This siteId' + " " + str(data['entry']['id']) + " " + 'does not exist.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'site',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+        else:
+            wiz_ob = self.env['site'].create(
+                {'pop_up': 'Please check your request and try again!'})
             return {
                 'name': _('Alert'),
                 'view_type': 'form',
