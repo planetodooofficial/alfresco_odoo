@@ -48,7 +48,7 @@
     </record>
 
     <menuitem id="alf_operations"
-              name="Alfresco API"
+              name="Alfresco"
               groups="base.group_user"/>
 
     <menuitem id="alf_auth_ticket_id"

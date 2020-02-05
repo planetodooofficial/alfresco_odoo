@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Alfresco CMS',
+    'name': 'Alfresco',
     'version': '1.0.0',
     'summary': 'Alfresco Document Management System integration with Odoo',
     'category': 'API',
