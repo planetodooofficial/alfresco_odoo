@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<odoo>
+
+    <record id="crm_case_claims_form_view" model="ir.ui.view">
+        <field name="name">CRM - Claims Form (cmis_crm_claim)</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Documents" groups="base.group_user">
+                    <button class="btn-primary" name="" icon="fa-folder" type="object" groups="base.group_user"/>
+                    <field name="notebook_ids"/>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="action_test_ui_id" model="ir.actions.act_window">
+        <field name="name">ActionTest</field>
+        <field name="res_model">testing.ui</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Test</p>
+        </field>
+    </record>
+
+    <record id="tree_view_id" model="ir.ui.view">
+        <field name="name">TreeTest</field>
+        <field name="model">testing.ui</field>
+        <field name="arch" type="xml">
+            <tree string="Details">
+                <field name="notebook_ids"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="form_id" model="ir.ui.view">
+        <field name="name">formtest</field>
+        <field name="model">testing.ui</field>
+        <field name="arch" type="xml">
+            <form string="Documents">
+                <sheet>
+                    <notebook>
+                        <page string="Page">
+                            <group>
+                                <group>
+                                    <field name="search_folder" string="Folders"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <button name="save_document_content" class="btn-primary" icon="fa-folder" type="object" groups="base.group_user"/>
+                                </group>
+                            </group>
+                            <field name="notebook_ids">
+                                <tree string="Details">
+                                    <field name="document_name"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="sub_menu_testing_ui" name="UI" action="action_test_ui_id"
+              parent="alfresco_odoo_connector.alf_operations" sequence="4"/>
+</odoo>
