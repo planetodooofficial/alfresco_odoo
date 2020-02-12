@@ -2,7 +2,7 @@
 {
     'name': 'Alfresco',
     'version': '1.0.0',
-    'summary': 'Alfresco Document Management System integration with Odoo',
+    'summary': 'Alfresco Document Management System connection with Odoo',
     'category': 'API',
     'author': 'Planet-Odoo',
     'maintainer': 'Planet-Odoo',
@@ -12,10 +12,10 @@
     'data': [
         'security/ir.model.access.csv',
         'view/alfresco_operation_view.xml',
+        'view/test_view.xml',
         'wizard/alfresco_files_folder_view.xml',
         'wizard/alfresco_site_view.xml',
         'wizard/pop_up_wizard_view.xml',
-        'wizard/inherited_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',
