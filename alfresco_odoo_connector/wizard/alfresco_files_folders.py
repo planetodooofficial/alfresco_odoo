@@ -28,7 +28,8 @@ class Manage_Files_Folders(models.TransientModel):
     alf_folder_desc = fields.Char("Folder Description")
     alf_folder_path = fields.Many2one('folder.details', string="Relative Path")
 
-    alf_file = fields.Binary("Upload a File")
+    alf_file = fields.Many2many(comodel_name="ir.attachment", relation="m2m_ir_attachment_relation",
+                                column1="m2m_id", column2="attachment_id", string="Upload a File")
     alf_file_name = fields.Char("File Name")
     alf_file_title = fields.Char("File Title")
     alf_file_description = fields.Char("File Description")
@@ -275,6 +276,8 @@ class Manage_Files_Folders(models.TransientModel):
     def upload_file(self):
         """Uploading a file to the Repository means creating a node with metadata and content."""
 
+        response = False
+
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
@@ -289,16 +292,17 @@ class Manage_Files_Folders(models.TransientModel):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        file_data = base64.b64decode(self.alf_file)
+        for file in self.alf_file:
+            file_data = base64.b64decode(file.datas)
 
-        files = {
-            'filedata': file_data,
-            'name': (None, self.alf_file_name),
-            'nodeType': (None, 'cm:content'),
-            'relativePath': (None, "/" + self.alf_folder_path.name),
-        }
+            files = {
+                'filedata': file_data,
+                'name': (None, file.display_name),
+                'nodeType': (None, 'cm:content'),
+                'relativePath': (None, "/" + self.alf_folder_path.name),
+            }
 
-        response = requests.post(base_url, headers=headers, files=files)
+            response = requests.post(base_url, headers=headers, files=files)
         if response.status_code == 201:
 
             # This Wizard is use to display the information which we are getting in Response.

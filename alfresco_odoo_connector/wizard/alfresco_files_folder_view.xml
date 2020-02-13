@@ -79,7 +79,7 @@
                 <form string="Uplaod File">
                     <group>
                         <group>
-                            <field name="alf_file" filename="alf_file_name" required="1"/>
+                            <field name="alf_file" filename="alf_file_name" required="1" widget="many2many_binary"/>
                             <field name="alf_folder_path" required="True" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
                             <field name="alf_file_title" placeholder="optional"/>
                             <field name="alf_file_description" placeholder="optional"/>

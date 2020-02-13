@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <odoo>
-
     <record id="crm_case_claims_form_view" model="ir.ui.view">
         <field name="name">CRM - Claims Form (cmis_crm_claim)</field>
         <field name="model">sale.order</field>
@@ -46,23 +44,18 @@
                         <page string="Page">
                             <group>
                                 <div>
-                                    <table style="width:100%">
-                                        <tr>
-                                            <button name="save_document_content" class="btn-primary" icon="fa-refresh" type="object" groups="base.group_user" />
-                                            <button name="save_document_content" class="btn-primary" icon="fa-folder" type="object" groups="base.group_user" margin="left"/>
-                                            <button name="save_document_content" class="btn-primary" icon="fa-file" type="object" groups="base.group_user"/>
-                                        </tr>
-                                    </table>
+                                    <button name="save_document_content"  class="btn btn-light"
+                                            icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>
+                                    <button name="save_document_content" class="btn btn-light"
+                                            icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"/>
+                                    <button name="save_document_content" class="btn btn-light"
+                                            icon="fa-file" type="object" groups="base.group_user" help="Import Files"/>
                                 </div>
                             </group>
                             <group>
-                                <group>
-                                    <group>
-                                        <field name="search_folder" string="Folders"/>
-                                    </group>
-                                </group>
+                                <field name="search_folder" string="Folders"/>
                             </group>
-                            <field name="notebook_ids">
+                            <field name="notebook_ids" widget="one2many">
                                 <tree string="Details">
                                     <field name="document_name"/>
                                     <button name="save_document_content"
