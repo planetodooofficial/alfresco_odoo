@@ -45,18 +45,32 @@
                     <notebook>
                         <page string="Page">
                             <group>
-                                <group>
-                                    <field name="search_folder" string="Folders"/>
-                                </group>
+                                <div>
+                                    <table style="width:100%">
+                                        <tr>
+                                            <button name="save_document_content" class="btn-primary" icon="fa-refresh" type="object" groups="base.group_user" />
+                                            <button name="save_document_content" class="btn-primary" icon="fa-folder" type="object" groups="base.group_user" margin="left"/>
+                                            <button name="save_document_content" class="btn-primary" icon="fa-file" type="object" groups="base.group_user"/>
+                                        </tr>
+                                    </table>
+                                </div>
                             </group>
                             <group>
                                 <group>
-                                    <button name="save_document_content" class="btn-primary" icon="fa-folder" type="object" groups="base.group_user"/>
+                                    <group>
+                                        <field name="search_folder" string="Folders"/>
+                                    </group>
                                 </group>
                             </group>
                             <field name="notebook_ids">
                                 <tree string="Details">
                                     <field name="document_name"/>
+                                    <button name="save_document_content"
+                                            icon="fa-trash" type="object" groups="base.group_user"/>
+                                    <button name="save_document_content"
+                                            icon="fa-download" type="object" groups="base.group_user"/>
+                                    <button name="save_document_content"
+                                            icon="fa-eye" type="object" groups="base.group_user"/>
                                 </tree>
                             </field>
                         </page>

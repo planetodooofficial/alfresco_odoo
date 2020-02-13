@@ -10,6 +10,7 @@ class A1(models.Model):
     _inherit = ['sale.order']
 
     notebook_ids = fields.One2many('testing', 'main_class_id', string="Test B2")
+    search_folder = fields.Many2one('folder.details', string="Folders")
 
 
 class A3(models.Model):
@@ -20,7 +21,7 @@ class A3(models.Model):
 
     def save_document_content(self):
 
-        list_of_names = []
+        list_of_documents = []
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
@@ -37,12 +38,15 @@ class A3(models.Model):
         response = requests.get(get_file_url, headers=headers)
         response_data = json.loads(response.text)
         if response_data['list']['pagination']['count'] >= 1:
-            for record in response_data['list']['entries']['entry']:
-                print(record)
-                # list_of_names.append(record['name'])
-                # print(list_of_names)
-                pass
-        print(response_data)
+            for record in response_data['list']['entries']:
+                if record['entry']['name']:
+                    name = record['entry']['name']
+                    document_vals = (2, self.id, {
+                        'document_name': name
+                    })
+                    # self.create({'notebook_ids': document_vals})
+
+        print(list_of_documents)
 
 
 class A2(models.Model):
