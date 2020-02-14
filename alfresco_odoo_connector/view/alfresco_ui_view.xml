@@ -58,7 +58,7 @@
                             <field name="notebook_ids" widget="one2many">
                                 <tree string="Details">
                                     <field name="document_name"/>
-                                    <button name="save_document_content"
+                                    <button name="delete_files"
                                             icon="fa-trash" type="object" groups="base.group_user"/>
                                     <button name="save_document_content"
                                             icon="fa-download" type="object" groups="base.group_user"/>

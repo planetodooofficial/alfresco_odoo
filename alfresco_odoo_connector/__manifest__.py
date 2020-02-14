@@ -12,7 +12,7 @@
     'data': [
         'security/ir.model.access.csv',
         'view/alfresco_operation_view.xml',
-        'view/test_view.xml',
+        'view/alfresco_ui_view.xml',
         'wizard/alfresco_files_folder_view.xml',
         'wizard/alfresco_site_view.xml',
         'wizard/pop_up_wizard_view.xml',

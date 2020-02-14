@@ -1,2 +1,2 @@
 from . import alfresco_operations
-from . import test
+from . import alfresco_user_interface
