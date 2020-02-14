@@ -46,21 +46,23 @@
                                 <div>
                                     <button name="save_document_content"  class="btn btn-light"
                                             icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>
-                                    <button name="save_document_content" class="btn btn-light"
-                                            icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"/>
-                                    <button name="save_document_content" class="btn btn-light"
-                                            icon="fa-file" type="object" groups="base.group_user" help="Import Files"/>
+                                    <button name="%(alfresco_odoo_connector.action_files_folder)d" class="btn btn-light"
+                                            icon="fa-folder" type="action" groups="base.group_user" help="Create Folder"/>
+                                    <button name="%(alfresco_odoo_connector.action_files)d" class="btn btn-light"
+                                            icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>
                                 </div>
                             </group>
                             <group>
-                                <field name="search_folder" string="Folders"/>
+                                <group>
+                                    <field name="search_folder"/>
+                                </group>
                             </group>
                             <field name="notebook_ids" widget="one2many">
                                 <tree string="Details">
                                     <field name="document_name"/>
                                     <button name="delete_files"
                                             icon="fa-trash" type="object" groups="base.group_user"/>
-                                    <button name="save_document_content"
+                                    <button name="download_files"
                                             icon="fa-download" type="object" groups="base.group_user"/>
                                     <button name="save_document_content"
                                             icon="fa-eye" type="object" groups="base.group_user"/>

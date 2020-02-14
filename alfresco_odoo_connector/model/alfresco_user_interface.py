@@ -1,8 +1,4 @@
 from odoo import api, fields, models, _, tools
-from odoo.exceptions import UserError, ValidationError
-import base64
-import logging
-import sqlite3
 import requests
 import json
 
@@ -18,7 +14,7 @@ class A3(models.Model):
     _name = 'testing.ui'
 
     notebook_ids = fields.One2many('testing', 'main_class_id', string="Test B2")
-    search_folder = fields.Many2one('folder.details', string="Folders")
+    search_folder = fields.Many2one('folder.details', string="Folder")
 
     def save_document_content(self):
 
@@ -27,7 +23,8 @@ class A3(models.Model):
 
         folder = self.env['folder.details'].search([('name', '=', self.search_folder.name)])
 
-        get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(folder.folder_id) + '/children'
+        get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            folder.folder_id) + '/children'
 
         headers = {
             'Content-Type': 'application/json',
@@ -63,7 +60,7 @@ class A3(models.Model):
                 wiz_ob = self.env['pop.auth'].create(
                     {'pop_up': 'Files Exported Successfully.'})
                 return {
-                    'name': _('Authentication'),
+                    'name': _('Refresh Repository'),
                     'view_type': 'form',
                     'view_mode': 'form',
                     'res_model': 'pop.auth',
@@ -75,9 +72,9 @@ class A3(models.Model):
                 }
             else:
                 wiz_ob = self.env['pop.auth'].create(
-                    {'pop_up': 'Your file has been deleted.'})
+                    {'pop_up': 'Folder does not contains any files.'})
                 return {
-                    'name': _('Authentication'),
+                    'name': _('Refresh Repository'),
                     'view_type': 'form',
                     'view_mode': 'form',
                     'res_model': 'pop.auth',
@@ -98,15 +95,17 @@ class A2(models.Model):
 
     def delete_files(self):
         ticket = self.env['alfresco.operations'].search([], limit=1)
-        ui_call = self.env['testing.ui'].search([], limit=1)
         ticket.get_auth_token_header()
+
+        ui_call = self.env['testing.ui'].search([], limit=1)
 
         headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Basic' " " + str(ticket.alf_encoded_ticket)
         }
 
-        download_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(self.document_id)
+        download_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            self.document_id)
 
         response_get_id = requests.delete(download_file_url, headers=headers)
         if response_get_id.status_code == 204:
@@ -115,6 +114,37 @@ class A2(models.Model):
                 {'pop_up': 'Your file has been deleted.'})
             return {
                 'name': _('Authentication'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'pop.auth',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+
+    def download_files(self):
+        ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic' " " + str(ticket.alf_encoded_ticket)
+        }
+
+        datas = {
+            "nodeIds": str(self.document_id)
+        }
+
+        url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/downloads'
+
+        response = requests.post(url, headers=headers, data=json.dumps(datas))
+        if response.status_code == 202:
+            wiz_ob = self.env['pop.auth'].create(
+                {'pop_up': 'Your file has been downloaded.'})
+            return {
+                'name': _('Downloads'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.auth',
