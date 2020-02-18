@@ -141,7 +141,7 @@ class A2(models.Model):
             return {
                 'type': 'ir.actions.act_url',
                 'url': url,
-                'target': 'new',  # open in a new tab
+                'target': 'self'
             }
         else:
             raise ValidationError(_("Please check your request and try again!"))
