@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _, tools
+from odoo.exceptions import UserError, ValidationError
 import requests
 import json
 
@@ -133,24 +134,14 @@ class A2(models.Model):
             'Authorization': 'Basic' " " + str(ticket.alf_encoded_ticket)
         }
 
-        datas = {
-            "nodeIds": str(self.document_id)
-        }
+        url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(self.document_id) + '/content'
 
-        url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/downloads'
-
-        response = requests.post(url, headers=headers, data=json.dumps(datas))
-        if response.status_code == 202:
-            wiz_ob = self.env['pop.auth'].create(
-                {'pop_up': 'Your file has been downloaded.'})
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
             return {
-                'name': _('Downloads'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.auth',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
+                'type': 'ir.actions.act_url',
+                'url': url,
+                'target': 'new',  # open in a new tab
             }
+        else:
+            raise ValidationError(_("Please check your request and try again!"))
