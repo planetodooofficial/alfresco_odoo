@@ -29,7 +29,7 @@ class Manage_Files_Folders(models.TransientModel):
     alf_folder_path = fields.Many2one('folder.details', string="Relative Path")
 
     alf_file = fields.Many2many(comodel_name="ir.attachment", relation="m2m_ir_attachment_relation",
-                                column1="m2m_id", column2="attachment_id", string="Upload a File")
+                                column1="m2m_id", column2="attachment_id", string="Upload Files")
     alf_file_name = fields.Char("File Name")
     alf_file_title = fields.Char("File Title")
     alf_file_description = fields.Char("File Description")
@@ -188,7 +188,7 @@ class Manage_Files_Folders(models.TransientModel):
 
     def update_folder_cron(self):
         """This function will list all the folder in the Repository"""
-        """Also It will be used in the CRON to update the folder list in Odoo Database with folder list in Alfresco Repository"""
+        """Also It will be used in "ir.cron" to update the folder list in Odoo Database with folder list from Alfresco Repository"""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
@@ -219,7 +219,19 @@ class Manage_Files_Folders(models.TransientModel):
                         folder.unlink()
                         self._cr.commit()
             else:
-                raise ValidationError(_("There no folders in the repository"))
+                wiz_ob = self.env['pop.list.content'].create(
+                    {'popup_list_content': "Folders doesn't exist!"})
+                return {
+                    'name': _('Alert'),
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'pop.list.content',
+                    'res_id': wiz_ob.id,
+                    'view_id': False,
+                    'target': 'new',
+                    'views': False,
+                    'type': 'ir.actions.act_window',
+                }
             wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
             return {
                 'name': _('Alert'),
