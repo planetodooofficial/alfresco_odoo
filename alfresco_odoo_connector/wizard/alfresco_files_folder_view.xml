@@ -116,8 +116,19 @@
             <field name="numbercall">-1</field>
             <field name="model_id" ref="model_alfresco_files_folder"/>
             <field name="state">code</field>
-            <field name="code">model.list_contents_for_folders()</field>
+            <field name="code">model.update_folder_cron()</field>
         </record>
+
+        <!--        Server Action-->
+
+<!--        <record id="action_folder_update" model="ir.actions.server">-->
+<!--            <field name="name">Update Folder List</field>-->
+<!--            <field name="model_id" ref="alfresco_odoo_connector.model_alfresco_files_folder"/>-->
+<!--            <field name="state">code</field>-->
+<!--            <field name="code">-->
+<!--                action = model.update_folder_cron()-->
+<!--            </field>-->
+<!--        </record>-->
 
         <!--        Menu for Files and Folder-->
         <menuitem id="menu_file_folder" name="Files &amp; Folder"

@@ -232,18 +232,18 @@ class Manage_Files_Folders(models.TransientModel):
                     'views': False,
                     'type': 'ir.actions.act_window',
                 }
-            wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
-            return {
-                'name': _('Alert'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.list.content',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
+            # wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
+            # return {
+            #     'name': _('Alert'),
+            #     'view_type': 'form',
+            #     'view_mode': 'form',
+            #     'res_model': 'pop.list.content',
+            #     'res_id': wiz_ob.id,
+            #     'view_id': False,
+            #     'target': 'new',
+            #     'views': False,
+            #     'type': 'ir.actions.act_window',
+            # }
 
     # def filter_contents_of_folder(self):
     #     """This function will list the contents of a folder in the repository"""
