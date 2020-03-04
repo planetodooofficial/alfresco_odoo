@@ -35,6 +35,14 @@ class Manage_Files_Folders(models.TransientModel):
     alf_file_description = fields.Char("File Description")
 
     alf_search_folder = fields.Many2one('folder.details', string="Select Folder")
+    alf_relative_path = fields.Char('Relative Path')
+
+    @api.model
+    def default_get(self, default_field):
+        res = super(Manage_Files_Folders, self).default_get(default_field)
+        if self._context.get('path'):
+            res['alf_relative_path'] = self._context.get('path')
+        return res
 
     def create_folder(self):
         """This function is to create folders in your root directory."""
@@ -321,7 +329,7 @@ class Manage_Files_Folders(models.TransientModel):
                 'filedata': file_data,
                 'name': (None, file.display_name),
                 'nodeType': (None, 'cm:content'),
-                'relativePath': (None, "/" + self.alf_folder_path.name),
+                'relativePath': (None, self.alf_relative_path + self.alf_folder_path.name),
             }
 
             response = requests.post(base_url, headers=headers, files=files)

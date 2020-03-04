@@ -9,8 +9,11 @@ import json
 class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
 
-    notebook_ids = fields.One2many('alf.ui.functionality', 'id', string="Documents List")
+    notebook_ids = fields.One2many('alf.ui.functionality', 'sale_order_id', string="Documents List")
     search_folder = fields.Many2one('folder.details', string="Folder")
+    active = fields.Boolean('Folder Created', default=False)
+    relative_path = fields.Char('Path', default='/Odoo/Sales Order/')
+    attachment_count = fields.Integer('Count')
 
     def save_document_content(self):
 
@@ -30,6 +33,7 @@ class SaleOrderInherit(models.Model):
         response = requests.get(get_file_url, headers=headers)
         if response.status_code == 200:
             response_data = json.loads(response.text)
+            self.attachment_count = response_data['list']['pagination']['count']
 
             result = self._cr.execute('delete from alf_ui_functionality')
 
@@ -39,7 +43,7 @@ class SaleOrderInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'id': self.id,
+                            'sale_order_id': self.id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -81,28 +85,8 @@ class SaleOrderInherit(models.Model):
                     'type': 'ir.actions.act_window',
                 }
 
-
-class Manage_Files_Folders(models.TransientModel):
-    """This class contains all the functionality for managing files &
-    folder in the Alfresco Repository"""
-
-    _name = 'alfresco.files.folder'
-
-    alf_folder_name = fields.Char("Folder Name")
-    alf_folder_title = fields.Char("Folder Title")
-    alf_folder_desc = fields.Char("Folder Description")
-    alf_folder_path = fields.Many2one('folder.details', string="Relative Path")
-
-    alf_file = fields.Many2many(comodel_name="ir.attachment", relation="m2m_ir_attachment_relation",
-                                column1="m2m_id", column2="attachment_id", string="Upload Files")
-    alf_file_name = fields.Char("File Name")
-    alf_file_title = fields.Char("File Title")
-    alf_file_description = fields.Char("File Description")
-
-    alf_search_folder = fields.Many2one('folder.details', string="Select Folder")
-
-    def folder_creation(self):
-        """This function is to create folders in your root directory."""
+    def create_folders(self):
+        """This function is to create folder inside folder inside root folder into root directory."""
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
@@ -115,9 +99,9 @@ class Manage_Files_Folders(models.TransientModel):
         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
 
         datas = {
-            "name": False,
+            "name": "",
             "nodeType": "cm:folder",
-            "relativePath": False,
+            "relativePath": "",
         }
 
         headers = {
@@ -125,21 +109,25 @@ class Manage_Files_Folders(models.TransientModel):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        if datas['name'] is False:
+        response_2 = False
+
+        if not datas['name']:
             datas.update({'name': 'Odoo'})
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
-        if response.status_code == 201:
-            if datas['name'] is 'Odoo':
-                datas.update({'name': 'Sale Orders', 'relativePath': '/Odoo'})
-                response = requests.post(base_url, data=json.dumps(datas), headers=headers)
-                if response.status_code == 201:
-                    if datas['name'] is 'Sale Orders':
-                        datas.update({'name': 'SO001', 'relativePath': '/Odoo/Sale Orders'})
-                        response = requests.post(base_url, data=json.dumps(datas), headers=headers)
-        data = json.loads(response.text)
-        if response.status_code == 201:
-            self.env['folder.details'].create({'name': data['entry']['name'],
-                                               'folder_id': data['entry']['id']})
+        if response.status_code == 201 or response.status_code == 409:
+            if datas['name'] == 'Odoo':
+                datas.update({'name': 'Sales Order', 'relativePath': '/Odoo'})
+                response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_1.status_code == 201 or response_1.status_code == 409:
+                    if datas['name'] == 'Sales Order':
+                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Sales Order'})
+                        response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
+        if response_2.status_code == 201:
+            data_response_2 = json.loads(response_2.text)
+            self.env['folder.details'].create({'name': data_response_2['entry']['name'],
+                                               'folder_id': data_response_2['entry']['id']})
+            if self.active is False:
+                self.update({'active': True})
 
             # This Wizard is use to display the information which we are getting in Response.
 
@@ -158,7 +146,8 @@ class Manage_Files_Folders(models.TransientModel):
             }
 
         elif response.status_code == 409:
-            wiz_ob = self.env['pop.folder'].create({'pop_up': data["error"]["errorKey"]})
+            data_response_2 = json.loads(response_2.text)
+            wiz_ob = self.env['pop.folder'].create({'pop_up': data_response_2["error"]["errorKey"]})
             return {
                 'name': _('Create Folder'),
                 'view_type': 'form',
@@ -177,80 +166,6 @@ class Manage_Files_Folders(models.TransientModel):
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
-
-    def upload_files(self):
-        """Uploading a file to the Repository means creating a node with metadata and content."""
-
-        response = False
-
-        ticket = self.env['alfresco.operations'].search([], limit=1)
-        ticket.get_auth_token_header()
-
-        if ticket.alf_encoded_ticket:
-            pass
-        else:
-            raise ValidationError(_("Please Login!!!"))
-
-        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
-
-        headers = {
-            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
-        }
-
-        for file in self.alf_file:
-            file_data = base64.b64decode(file.datas)
-
-            files = {
-                'filedata': file_data,
-                'name': (None, file.display_name),
-                'nodeType': (None, 'cm:content'),
-                'relativePath': ("/Odoo/Sale Orders/" + self.alf_folder_path.name),
-            }
-
-            response = requests.post(base_url, headers=headers, files=files)
-        if response.status_code == 201:
-
-            # This Wizard is use to display the information which we are getting in Response.
-
-            wiz_ob = self.env['file.msg'].create({'pop_up': 'Your file has been uploaded.'})
-            return {
-                'name': _('Alert'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'file.msg',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
-        elif response.status_code == 409:
-            wiz_ob = self.env['file.msg'].create(
-                {'pop_up': 'New name clashes with an existing file in the current folder.'})
-            return {
-                'name': _('Alert'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'file.msg',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
-        else:
-            wiz_ob = self.env['file.msg'].create({'pop_up': 'Please check your request and try again!'})
-            return {
-                'name': _('Alert'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'file.msg',
                 'res_id': wiz_ob.id,
                 'view_id': False,
                 'target': 'new',
@@ -338,7 +253,7 @@ class Manage_Files_Folders(models.TransientModel):
 class AlfrescoUIFunctionality(models.Model):
     _name = 'alf.ui.functionality'
 
-    id = fields.Many2one('sale.order', string="ID")
+    sale_order_id = fields.Many2one('sale.order', string="ID")
     document_name = fields.Char("Doc Name")
     document_id = fields.Char("Doc ID")
 
@@ -390,7 +305,7 @@ class AlfrescoUIFunctionality(models.Model):
             return {
                 'type': 'ir.actions.act_url',
                 'url': url,
-                'target': 'self'
+                'target': 'new'
             }
         else:
             raise ValidationError(_("Please check your request and try again!"))
