@@ -1,80 +1,160 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="crm_case_claims_form_view" model="ir.ui.view">
-        <field name="name">CRM - Claims Form (cmis_crm_claim)</field>
+    <record id="sale_order_document_alfresco" model="ir.ui.view">
+        <field name="name">Sale Order - Documents For Alfresco</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Documents" groups="base.group_user">
-                    <button class="btn-primary" name="" icon="fa-folder" type="object" groups="base.group_user"/>
-                    <field name="notebook_ids"/>
+                    <group>
+                        <div>
+                            <button name="save_document_content"  class="btn btn-light"
+                                    icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>
+                            <button name="create_folders" class="btn btn-light"
+                                    icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"/>
+                            <button name="%(action_upload_files)d" class="btn btn-light"
+                                    icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>
+                        </div>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="search_folder"/>
+                        </group>
+                    </group>
+                    <field name="notebook_ids" widget="one2many">
+                        <tree string="Details">
+                            <field name="document_name"/>
+                            <button name="delete_files"
+                                    icon="fa-trash" type="object" groups="base.group_user"/>
+                            <button name="download_files"
+                                    icon="fa-download" type="object" groups="base.group_user"/>
+                        </tree>
+                    </field>
                 </page>
             </notebook>
         </field>
     </record>
 
-    <record id="action_test_ui_id" model="ir.actions.act_window">
-        <field name="name">ActionTest</field>
-        <field name="res_model">testing.ui</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="help" type="html">
-            <p class="oe_view_nocontent_create">Test</p>
-        </field>
-    </record>
-
-    <record id="tree_view_id" model="ir.ui.view">
-        <field name="name">TreeTest</field>
-        <field name="model">testing.ui</field>
+    <record id="upload_files_id" model="ir.ui.view">
+        <field name="name">upload.files.id</field>
+        <field name="model">alfresco.files.folder</field>
         <field name="arch" type="xml">
-            <tree string="Details">
-                <field name="notebook_ids"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="form_id" model="ir.ui.view">
-        <field name="name">formtest</field>
-        <field name="model">testing.ui</field>
-        <field name="arch" type="xml">
-            <form string="Documents">
-                <sheet>
-                    <notebook>
-                        <page string="Page">
-                            <group>
-                                <div>
-                                    <button name="save_document_content"  class="btn btn-light"
-                                            icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>
-                                    <button name="%(alfresco_odoo_connector.action_files_folder)d" class="btn btn-light"
-                                            icon="fa-folder" type="action" groups="base.group_user" help="Create Folder"/>
-                                    <button name="%(alfresco_odoo_connector.action_files)d" class="btn btn-light"
-                                            icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>
-                                </div>
-                            </group>
-                            <group>
-                                <group>
-                                    <field name="search_folder"/>
-                                </group>
-                            </group>
-                            <field name="notebook_ids" widget="one2many">
-                                <tree string="Details">
-                                    <field name="document_name"/>
-                                    <button name="delete_files"
-                                            icon="fa-trash" type="object" groups="base.group_user"/>
-                                    <button name="download_files"
-                                            icon="fa-download" type="object" groups="base.group_user"/>
-                                    <button name="save_document_content"
-                                            icon="fa-eye" type="object" groups="base.group_user"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
+            <form string="Upload File">
+                <group>
+                    <group>
+                        <field name="alf_file" filename="alf_file_name" required="1" widget="many2many_binary"/>
+                        <field name="alf_folder_path" required="True" options="{'no_open':True,'no_create':1,'no_create_edit':1}"/>
+                        <!--                            <field name="alf_file_title" placeholder="optional"/>-->
+                        <!--                            <field name="alf_file_description" placeholder="optional"/>-->
+                        <!--                            <field name="alf_file_name" invisible="1"/>-->
+                    </group>
+                </group>
+                <footer>
+                    <button name="upload_files" string="Upload File" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
             </form>
         </field>
     </record>
 
-    <menuitem id="sub_menu_testing_ui" name="UI" action="action_test_ui_id"
-              parent="alfresco_odoo_connector.alf_operations" sequence="4"/>
+    <record id="action_upload_files" model="ir.actions.act_window">
+        <field name="name">Upload Files</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">alfresco.files.folder</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="upload_files_id"/>
+        <field name="target">new</field>
+    </record>
+
+    <!--    <record id="purchase_order_document_alfresco" model="ir.ui.view">-->
+    <!--        <field name="name">Purchase Order - Documents For Alfresco</field>-->
+    <!--        <field name="model">purchase.order</field>-->
+    <!--        <field name="inherit_id" ref="purchase.purchase_order_form"/>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <notebook position="inside">-->
+    <!--                <page string="Documents" groups="base.group_user">-->
+    <!--                    <group>-->
+    <!--                        <div>-->
+    <!--                            <button name="save_document_content"  class="btn btn-light"-->
+    <!--                                    icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>-->
+    <!--                            <button name="%(alfresco_odoo_connector.action_files_folder)d" class="btn btn-light"-->
+    <!--                                    icon="fa-folder" type="action" groups="base.group_user" help="Create Folder"/>-->
+    <!--                            <button name="%(alfresco_odoo_connector.action_files)d" class="btn btn-light"-->
+    <!--                                    icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>-->
+    <!--                        </div>-->
+    <!--                    </group>-->
+    <!--                    <group>-->
+    <!--                        <group>-->
+    <!--                            <field name="search_folder"/>-->
+    <!--                        </group>-->
+    <!--                    </group>-->
+    <!--                    <field name="notebook_ids" widget="one2many">-->
+    <!--                        <tree string="Details">-->
+    <!--                            <field name="document_name"/>-->
+    <!--                            <button name="delete_files"-->
+    <!--                                    icon="fa-trash" type="object" groups="base.group_user"/>-->
+    <!--                            <button name="download_files"-->
+    <!--                                    icon="fa-download" type="object" groups="base.group_user"/>-->
+    <!--                        </tree>-->
+    <!--                    </field>-->
+    <!--                </page>-->
+    <!--            </notebook>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!--    <record id="action_test_ui_id" model="ir.actions.act_window">-->
+    <!--        <field name="name">ActionTest</field>-->
+    <!--        <field name="res_model">testing.ui</field>-->
+    <!--        <field name="view_type">form</field>-->
+    <!--        <field name="view_mode">tree,form</field>-->
+    <!--        <field name="help" type="html">-->
+    <!--            <p class="oe_view_nocontent_create">Test</p>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!--    <record id="form_id" model="ir.ui.view">-->
+    <!--        <field name="name">formtest</field>-->
+    <!--        <field name="model">testing.ui</field>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <form string="Documents">-->
+    <!--                <sheet>-->
+    <!--                    <notebook>-->
+    <!--                        <page string="Page">-->
+    <!--                            <group>-->
+    <!--                                <div>-->
+    <!--                                    <button name="save_document_content"  class="btn btn-light"-->
+    <!--                                            icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>-->
+    <!--                                    <button name="%(alfresco_odoo_connector.action_files_folder)d" class="btn btn-light"-->
+    <!--                                            icon="fa-folder" type="action" groups="base.group_user" help="Create Folder"/>-->
+    <!--                                    <button name="%(alfresco_odoo_connector.action_files)d" class="btn btn-light"-->
+    <!--                                            icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>-->
+    <!--                                </div>-->
+    <!--                            </group>-->
+    <!--                            <group>-->
+    <!--                                <group>-->
+    <!--                                    <field name="search_folder"/>-->
+    <!--                                </group>-->
+    <!--                            </group>-->
+    <!--                            <field name="notebook_ids" widget="one2many">-->
+    <!--                                <tree string="Details">-->
+    <!--                                    <field name="document_name"/>-->
+    <!--                                    <button name="delete_files"-->
+    <!--                                            icon="fa-trash" type="object" groups="base.group_user"/>-->
+    <!--                                    <button name="download_files"-->
+    <!--                                            icon="fa-download" type="object" groups="base.group_user"/>-->
+    <!--                                    &lt;!&ndash;                                    <button name="save_document_content"&ndash;&gt;-->
+    <!--                                    &lt;!&ndash;                                            icon="fa-eye" type="object" groups="base.group_user"/>&ndash;&gt;-->
+    <!--                                </tree>-->
+    <!--                            </field>-->
+    <!--                        </page>-->
+    <!--                    </notebook>-->
+    <!--                </sheet>-->
+    <!--            </form>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!--    <menuitem id="sub_menu_testing_ui" name="UI" action="action_test_ui_id"-->
+    <!--              parent="alfresco_odoo_connector.alf_operations" sequence="4"/>-->
 </odoo>

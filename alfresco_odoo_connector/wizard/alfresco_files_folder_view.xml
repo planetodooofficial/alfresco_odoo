@@ -11,7 +11,7 @@
                 <form string="Create Folder">
                     <group>
                         <group>
-                            <field name="alf_folder_name" required="1"/>
+                            <field name="alf_folder_name" required="0"/>
                             <field name="alf_folder_title" placeholder="optional"/>
                             <field name="alf_folder_desc" placeholder="optional"/>
                         </group>
@@ -84,7 +84,6 @@
                             <field name="alf_file_title" placeholder="optional"/>
                             <field name="alf_file_description" placeholder="optional"/>
                             <field name="alf_file_name" invisible="1"/>
-
                         </group>
                     </group>
                     <footer>

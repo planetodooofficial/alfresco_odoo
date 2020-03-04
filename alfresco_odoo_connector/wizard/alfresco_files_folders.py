@@ -52,6 +52,7 @@ class Manage_Files_Folders(models.TransientModel):
         datas = {
             "name": self.alf_folder_name,
             "nodeType": "cm:folder",
+            "relativePath": "",
             "properties":
                 {
                     "cm:title": self.alf_folder_title,
@@ -64,8 +65,17 @@ class Manage_Files_Folders(models.TransientModel):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
+        if datas['name'] is False:
+            datas.update({'name': 'Odoo'})
+        if datas['name'] is 'Odoo':
+            datas.update({'name': 'Sale Orders', 'relativePath': '/Odoo'})
+        if datas['name'] is 'Sale Orders':
+            datas.update({'name': 'SO001', 'relativePath': '/Odoo/Sale Orders'})
+
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         data = json.loads(response.text)
+        if data['entry']['name'] is 'Odoo':
+            self.create_folder()
         if response.status_code == 201:
             self.env['folder.details'].create({'name': data['entry']['name'],
                                                'folder_id': data['entry']['id']})
@@ -73,9 +83,9 @@ class Manage_Files_Folders(models.TransientModel):
             # This Wizard is use to display the information which we are getting in Response.
 
             wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "been created"})
+                {'pop_up': "Folder Created"})
             return {
-                'name': _('Manage Folder'),
+                'name': _('Create Folder'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',
@@ -89,7 +99,7 @@ class Manage_Files_Folders(models.TransientModel):
         elif response.status_code == 409:
             wiz_ob = self.env['pop.folder'].create({'pop_up': data["error"]["errorKey"]})
             return {
-                'name': _('Manage Folder'),
+                'name': _('Create Folder'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',
@@ -102,7 +112,7 @@ class Manage_Files_Folders(models.TransientModel):
         else:
             wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
             return {
-                'name': _('Manage Folder'),
+                'name': _('Create Folder'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',
@@ -161,7 +171,7 @@ class Manage_Files_Folders(models.TransientModel):
             wiz_ob = self.env['pop.folder'].create(
                 {'pop_up': "Folder" + " " + data["entry"]["name"] + " " + "has been updated"})
             return {
-                'name': _('Manage Folder'),
+                'name': _('Update Folder'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',
@@ -175,7 +185,7 @@ class Manage_Files_Folders(models.TransientModel):
         else:
             wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
             return {
-                'name': _('Manage Folder'),
+                'name': _('Update Folder'),
                 'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'pop.folder',

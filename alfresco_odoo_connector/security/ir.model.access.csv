@@ -5,5 +5,5 @@ access_folder_details,folder.details,model_folder_details,base.group_user,1,1,1,
 access_sites_details,sites.details,model_sites_details,base.group_user,1,1,1,1
 access_manage_sites,manage.sites,model_manage_sites,base.group_user,1,1,1,1
 access_testing_ui,testing.ui,model_testing_ui,base.group_user,1,1,1,1
-access_testing,testing,model_testing,base.group_user,1,1,1,1
+access_alf_ui_functionality,alf.ui.functionality,model_alf_ui_functionality,base.group_user,1,1,1,1
 
