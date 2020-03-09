@@ -109,6 +109,8 @@ class SaleOrderInherit(models.Model):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
+        data_response_2 = False
+
         if not datas['name']:
             datas.update({'name': 'Odoo'})
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
@@ -120,8 +122,8 @@ class SaleOrderInherit(models.Model):
                     if datas['name'] == 'Sales Order':
                         datas.update({'name': str(self.name), 'relativePath': '/Odoo/Sales Order'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
-        if response_2.status_code == 201:
-            data_response_2 = json.loads(response_2.text)
+                        if response_2.status_code == 201:
+                            data_response_2 = json.loads(response_2.text)
             self.env['folder.details'].create({'name': data_response_2['entry']['name'],
                                                'folder_id': data_response_2['entry']['id']})
             if self.active is False:
