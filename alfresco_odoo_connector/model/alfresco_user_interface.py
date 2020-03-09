@@ -109,7 +109,7 @@ class SaleOrderInherit(models.Model):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        response_2 = False
+        response_2 = 00
 
         if not datas['name']:
             datas.update({'name': 'Odoo'})
