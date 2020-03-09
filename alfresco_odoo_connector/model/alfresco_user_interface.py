@@ -173,6 +173,9 @@ class SaleOrderInherit(models.Model):
                 'type': 'ir.actions.act_window',
             }
 
+    def view_attachment(self):
+        pass
+
 
 # class PurchaseOrderInherit(models.Model):
 #     _inherit = 'purchase.order'
