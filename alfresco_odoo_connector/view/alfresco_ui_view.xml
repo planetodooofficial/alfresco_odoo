@@ -5,15 +5,15 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-
-            <notebook position="inside">
-                <page string="Documents" groups="base.group_user">
-                    <div class="oe_button_box" name="button_box">
-                        <button
-                                class="oe_stat_button" icon="fa-paperclip">
+            <xpath expr="//sheet/div[@name='button_box']" position="inside">
+                <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-paperclip">
                             <field name="attachment_count" widget="statinfo" string="Attachments"/>
                         </button>
                     </div>
+            </xpath>
+            <notebook position="inside">
+                <page string="Documents" groups="base.group_user">
                     <group>
                         <div>
                             <button name="save_document_content"  class="btn btn-light"
