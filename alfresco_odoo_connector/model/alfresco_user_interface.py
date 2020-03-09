@@ -109,8 +109,6 @@ class SaleOrderInherit(models.Model):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        response_2 = 00
-
         if not datas['name']:
             datas.update({'name': 'Odoo'})
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
