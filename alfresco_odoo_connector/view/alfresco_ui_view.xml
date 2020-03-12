@@ -6,9 +6,9 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet/div[@name='button_box']" position="inside">
-                        <button name='view_attachment' class="oe_stat_button" icon="fa-paperclip">
-                            <field name="attachment_count" widget="statinfo" string="Attachments"/>
-                        </button>
+                <button name="display_count_attachment" type="object" class="oe_stat_button" icon="fa-paperclip">
+                    <field name="attachment_count" widget="statinfo" string="Attachments"/>
+                </button>
             </xpath>
             <notebook position="inside">
                 <page string="Documents" groups="base.group_user">

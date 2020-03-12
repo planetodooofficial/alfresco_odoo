@@ -15,6 +15,10 @@ class SaleOrderInherit(models.Model):
     relative_path = fields.Char('Path', default='/Odoo/Sales Order/')
     attachment_count = fields.Integer('Count')
 
+
+    def display_count_attachment(self):
+        pass
+
     def save_document_content(self):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
@@ -145,20 +149,20 @@ class SaleOrderInherit(models.Model):
                 'type': 'ir.actions.act_window',
             }
 
-        elif response.status_code == 409:
-            data_response_2 = json.loads(response_2.text)
-            wiz_ob = self.env['pop.folder'].create({'pop_up': data_response_2["error"]["errorKey"]})
-            return {
-                'name': _('Create Folder'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.folder',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
+        # elif response.status_code == 409:
+        #     data_response_2 = json.loads(response_2.text)
+        #     wiz_ob = self.env['pop.folder'].create({'pop_up': data_response_2["error"]["errorKey"]})
+        #     return {
+        #         'name': _('Create Folder'),
+        #         'view_type': 'form',
+        #         'view_mode': 'form',
+        #         'res_model': 'pop.folder',
+        #         'res_id': wiz_ob.id,
+        #         'view_id': False,
+        #         'target': 'new',
+        #         'views': False,
+        #         'type': 'ir.actions.act_window',
+        #     }
         else:
             wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
             return {
@@ -172,9 +176,6 @@ class SaleOrderInherit(models.Model):
                 'views': False,
                 'type': 'ir.actions.act_window',
             }
-
-    def view_attachment(self):
-        pass
 
 
 # class PurchaseOrderInherit(models.Model):
