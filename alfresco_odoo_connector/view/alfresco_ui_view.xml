@@ -19,14 +19,16 @@
                             <button name="create_folders" class="btn btn-light"
                                     icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"
                                     attrs="{'invisible': [('active', '=', True)]}"/>
-                            <button name="%(alfresco_odoo_connector.action_files)d" context="{'path': relative_path}"
+                            <button name="%(alfresco_odoo_connector.action_files)d"
+                                    context="{'path': relative_path, 'sale_id': sale_order_id}"
                                     class="btn btn-light"
                                     icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>
                         </div>
                     </group>
                     <group>
                         <group>
-                            <field name="search_folder"/>
+                            <field name="sale_order_id" invisible="1"/>
+<!--                            <field name="search_folder"/>-->
                             <field name="active" invisible="1"/>
                             <field name="relative_path" invisible="1"/>
                         </group>

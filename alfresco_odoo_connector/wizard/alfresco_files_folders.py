@@ -26,7 +26,7 @@ class Manage_Files_Folders(models.TransientModel):
     alf_folder_name = fields.Char("Folder Name")
     alf_folder_title = fields.Char("Folder Title")
     alf_folder_desc = fields.Char("Folder Description")
-    alf_folder_path = fields.Many2one('folder.details', string="Relative Path")
+    alf_folder_path = fields.Char(string="Relative Path")
 
     alf_file = fields.Many2many(comodel_name="ir.attachment", relation="m2m_ir_attachment_relation",
                                 column1="m2m_id", column2="attachment_id", string="Upload Files")
@@ -42,6 +42,8 @@ class Manage_Files_Folders(models.TransientModel):
         res = super(Manage_Files_Folders, self).default_get(default_field)
         if self._context.get('path'):
             res['alf_relative_path'] = self._context.get('path')
+        if self._context.get('sale_id'):
+            res['alf_folder_path'] = self._context.get('sale_id')
         return res
 
     def create_folder(self):
@@ -329,7 +331,7 @@ class Manage_Files_Folders(models.TransientModel):
                 'filedata': file_data,
                 'name': (None, file.display_name),
                 'nodeType': (None, 'cm:content'),
-                'relativePath': (None, self.alf_relative_path + self.alf_folder_path.name),
+                'relativePath': (None, self.alf_relative_path + self.alf_folder_path),
             }
 
             response = requests.post(base_url, headers=headers, files=files)

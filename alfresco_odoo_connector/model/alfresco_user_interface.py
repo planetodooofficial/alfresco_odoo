@@ -10,11 +10,24 @@ class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
 
     notebook_ids = fields.One2many('alf.ui.functionality', 'sale_order_id', string="Documents List")
-    search_folder = fields.Many2one('folder.details', string="Folder")
+    # search_folder = fields.Many2one('folder.details', string="Folder")
     active = fields.Boolean('Folder Created', default=False)
     relative_path = fields.Char('Path', default='/Odoo/Sales Order/')
     attachment_count = fields.Integer('Count')
+    sale_order_id = fields.Char('Sale Order ID')
 
+    @api.model
+    def default_get(self, default_field):
+        res = super(SaleOrderInherit, self).default_get(default_field)
+        if self._context.get('path'):
+            res['alf_relative_path'] = self._context.get('path')
+        return res
+
+    @api.model
+    def create(self, vals):
+        res = super(SaleOrderInherit, self).create(vals)
+        res.update({'sale_order_id': res.name})
+        return res
 
     def display_count_attachment(self):
         pass
@@ -24,7 +37,7 @@ class SaleOrderInherit(models.Model):
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
 
-        folder = self.env['folder.details'].search([('name', '=', self.search_folder.name)])
+        folder = self.env['folder.details'].search([('name', '=', self.sale_order_id)])
 
         get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
             folder.folder_id) + '/children'
@@ -105,7 +118,7 @@ class SaleOrderInherit(models.Model):
         datas = {
             "name": "",
             "nodeType": "cm:folder",
-            "relativePath": "",
+            "relativePath": "/Odoo/Sales Order/",
         }
 
         headers = {
@@ -113,10 +126,8 @@ class SaleOrderInherit(models.Model):
             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
         }
 
-        data_response_2 = False
-
         if not datas['name']:
-            datas.update({'name': 'Odoo'})
+            datas.update({'name': 'Odoo', 'relativePath': ''})
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
@@ -128,8 +139,8 @@ class SaleOrderInherit(models.Model):
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
-            self.env['folder.details'].create({'name': data_response_2['entry']['name'],
-                                               'folder_id': data_response_2['entry']['id']})
+                            self.env['folder.details'].create({'name': data_response_2['entry']['name'],
+                                                               'folder_id': data_response_2['entry']['id']})
             if self.active is False:
                 self.update({'active': True})
 
@@ -177,6 +188,66 @@ class SaleOrderInherit(models.Model):
                 'type': 'ir.actions.act_window',
             }
 
+    def upload_file(self):
+        """Uploading a file to the Repository means creating a node with metadata and content."""
+
+        response = False
+
+        ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
+
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
+        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
+
+        headers = {
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
+        }
+
+        for file in self.alf_file:
+            file_data = base64.b64decode(file.datas)
+
+            files = {
+                'filedata': file_data,
+                'name': (None, file.display_name),
+                'nodeType': (None, 'cm:content'),
+                'relativePath': (None, self.relative_path + str(self.name)),
+            }
+
+            response = requests.post(base_url, headers=headers, files=files)
+        if response.status_code == 201:
+
+            # This Wizard is use to display the information which we are getting in Response.
+
+            wiz_ob = self.env['file.msg'].create({'pop_up': 'Your file has been uploaded.'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'file.msg',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+        else:
+            wiz_ob = self.env['file.msg'].create({'pop_up': 'Please check your request and try again!'})
+            return {
+                'name': _('Alert'),
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'file.msg',
+                'res_id': wiz_ob.id,
+                'view_id': False,
+                'target': 'new',
+                'views': False,
+                'type': 'ir.actions.act_window',
+            }
+
 
 # class PurchaseOrderInherit(models.Model):
 #     _inherit = 'purchase.order'
@@ -189,7 +260,7 @@ class SaleOrderInherit(models.Model):
 #         ticket = self.env['alfresco.operations'].search([], limit=1)
 #         ticket.get_auth_token_header()
 #
-#         folder = self.env['folder.details'].search([('name', '=', self.search_folder.name)])
+#         folder = self.env['folder.details'].search([('name', '=', self.sale_order_id.name)])
 #
 #         get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
 #             folder.folder_id) + '/children'
