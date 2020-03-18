@@ -11,11 +11,11 @@
     'depends': ['base', 'purchase', 'sale', 'contacts', 'crm', 'stock', 'account', 'project', 'maintenance', 'hr'],
     'data': [
         'security/ir.model.access.csv',
+        'view/alfresco_operation_view.xml',
         'wizard/alfresco_files_folder_view.xml',
         'wizard/alfresco_site_view.xml',
         'wizard/pop_up_wizard_view.xml',
         'view/alfresco_ui_view.xml',
-        'view/alfresco_operation_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',
