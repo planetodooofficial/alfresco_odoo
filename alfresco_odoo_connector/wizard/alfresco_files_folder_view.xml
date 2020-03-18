@@ -107,17 +107,17 @@
 
         <!--        Folder Updates Using Cron-->
 
-        <record id="cron_do_folder_update" forcecreate='True' model="ir.cron">
-            <field name="name">Folder Update</field>
-            <field eval="True" name="active"/>
-            <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">6</field>
-            <field name="interval_type">hours</field>
-            <field name="numbercall">-1</field>
-            <field name="model_id" ref="model_alfresco_files_folder"/>
-            <field name="state">code</field>
-            <field name="code">model.update_folder_cron()</field>
-        </record>
+<!--        <record id="cron_do_folder_update" forcecreate='True' model="ir.cron">-->
+<!--            <field name="name">Folder Update</field>-->
+<!--            <field eval="True" name="active"/>-->
+<!--            <field name="user_id" ref="base.user_root"/>-->
+<!--            <field name="interval_number">6</field>-->
+<!--            <field name="interval_type">hours</field>-->
+<!--            <field name="numbercall">-1</field>-->
+<!--            <field name="model_id" ref="model_alfresco_files_folder"/>-->
+<!--            <field name="state">code</field>-->
+<!--            <field name="code">model.update_folder_cron()</field>-->
+<!--        </record>-->
 
         <!--        Server Action-->
 
@@ -137,8 +137,8 @@
         <menuitem id="sub_menu_create_folder" name="Create Folder"
                   action="action_files_folder" parent="alfresco_odoo_connector.menu_file_folder" sequence="1"/>
         <!--        Sub Menu for Update Folder-->
-        <menuitem id="sub_menu_update_folder" name="Update Folder"
-                  action="action_folder_update" parent="alfresco_odoo_connector.menu_file_folder" sequence="2"/>
+<!--        <menuitem id="sub_menu_update_folder" name="Update Folder"-->
+<!--                  action="action_folder_update" parent="alfresco_odoo_connector.menu_file_folder" sequence="2"/>-->
         <!--        Sub Menu for Upload Files-->
         <menuitem id="sub_menu_upload_file" name="Upload Files"
                   action="action_files" parent="alfresco_odoo_connector.menu_file_folder" sequence="3"/>
