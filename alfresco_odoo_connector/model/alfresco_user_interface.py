@@ -11,7 +11,7 @@ class SaleOrderInherit(models.Model):
 
     notebook_ids = fields.One2many('alf.ui.functionality', 'sale_order_id', string="Documents List")
     # search_folder = fields.Many2one('folder.details', string="Folder")
-    active = fields.Boolean('Folder Created', default=False)
+    is_active = fields.Boolean('Folder Created', default=False)
     relative_path = fields.Char('Path', default='/Odoo/Sales Order/')
     attachment_count = fields.Integer('Count')
     sale_order_id = fields.Char('Sale Order ID')
@@ -141,8 +141,8 @@ class SaleOrderInherit(models.Model):
                             data_response_2 = json.loads(response_2.text)
                             self.env['folder.details'].create({'name': data_response_2['entry']['name'],
                                                                'folder_id': data_response_2['entry']['id']})
-            if self.active is False:
-                self.update({'active': True})
+            if self.is_active is False:
+                self.update({'is_active': True})
 
             # This Wizard is use to display the information which we are getting in Response.
 

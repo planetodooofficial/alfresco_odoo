@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="sale_order_document_alfresco" model="ir.ui.view">
+    <record id="sale_document_alfresco" model="ir.ui.view">
         <field name="name">Sale Order - Documents For Alfresco</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
@@ -18,7 +18,7 @@
                                     icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>
                             <button name="create_folders" class="btn btn-light"
                                     icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"
-                                    attrs="{'invisible': [('active', '=', True)]}"/>
+                                    attrs="{'invisible': [('is_active', '=', True)]}"/>
                             <button name="%(alfresco_odoo_connector.action_files)d"
                                     context="{'path': relative_path, 'sale_id': sale_order_id}"
                                     class="btn btn-light"
@@ -27,10 +27,10 @@
                     </group>
                     <group>
                         <group>
-                            <field name="sale_order_id" invisible="1"/>
+                            <field name="sale_order_id" invisible="0"/>
 <!--                            <field name="search_folder"/>-->
-                            <field name="active" invisible="1"/>
-                            <field name="relative_path" invisible="1"/>
+                            <field name="is_active" invisible="0"/>
+                            <field name="relative_path" invisible="0"/>
                         </group>
                     </group>
                     <field name="notebook_ids" widget="one2many" readonly="1">
