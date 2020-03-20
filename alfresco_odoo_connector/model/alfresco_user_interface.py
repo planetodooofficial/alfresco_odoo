@@ -706,8 +706,8 @@ class ContactsInherit(models.Model):
     order_id = fields.Char('Contacts ID')
 
     @api.model
-    def default_get(self, fields):
-        res = super(ContactsInherit, self).default_get(fields)
+    def default_get(self, default_field):
+        res = super(ContactsInherit, self).default_get(default_field)
         if self._context.get('path'):
             res['alf_relative_path'] = self._context.get('path')
         return res

@@ -8,7 +8,7 @@
     'maintainer': 'Planet-Odoo',
     'company': 'Planet-Odoo',
     'website': '',
-    'depends': ['base', 'purchase', 'sale', 'crm', 'stock', 'account', 'project', 'maintenance', 'hr'],
+    'depends': ['base', 'purchase', 'sale', 'contacts', 'crm', 'stock', 'account', 'project', 'maintenance', 'hr'],
     'data': [
         'security/ir.model.access.csv',
         'view/alfresco_operation_view.xml',
