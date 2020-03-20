@@ -366,11 +366,13 @@ class InvoiceInherit(models.Model):
             res['alf_relative_path'] = self._context.get('path')
         return res
 
-    @api.model
-    def create(self, vals):
-        res = super(InvoiceInherit, self).create(vals)
-        res.update({'order_id': res.name})
-        return res
+    # @api.model
+    # def create(self, vals):
+    #     res = super(InvoiceInherit, self).create(vals)
+    #     x = res.number
+    #     new_name = x.replace("/", " ")
+    #     res.update({'order_id': new_name})
+    #     return res
 
     def display_count_attachment(self):
         pass
@@ -449,7 +451,9 @@ class InvoiceInherit(models.Model):
         """This function is to create folder inside folder inside root folder into root directory."""
 
         res = self.env['account.invoice'].search([('id', '=', self.id)])
-        res.write({'order_id': res.name})
+        x = res.number
+        name = x.replace("/", " ")
+        res.write({'order_id': name})
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
@@ -481,7 +485,7 @@ class InvoiceInherit(models.Model):
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Invoices & Bills':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Invoices & Bills'})
+                        datas.update({'name': str(self.order_id), 'relativePath': '/Odoo/Invoices & Bills'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
