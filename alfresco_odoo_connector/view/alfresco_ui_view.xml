@@ -414,8 +414,8 @@
                     </group>
                     <group>
                         <group>
-                            <field name="order_id" invisible="1"/>
-                            <field name="is_active" invisible="1"/>
+<!--                            <field name="order_id" invisible="1"/>-->
+<!--                            <field name="is_active" invisible="1"/>-->
 <!--                            <field name="relative_path" invisible="1"/>-->
                         </group>
                     </group>
