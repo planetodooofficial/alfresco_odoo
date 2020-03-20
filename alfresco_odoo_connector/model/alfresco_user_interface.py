@@ -705,12 +705,12 @@ class ContactsInherit(models.Model):
     attachment_count = fields.Integer('Count')
     order_id = fields.Char('Contacts ID')
 
-    @api.model
-    def default_get(self, fields):
-        res = super(ContactsInherit, self).default_get(fields)
-        if self._context.get('path'):
-            res['alf_relative_path'] = self._context.get('path')
-        return res
+    # @api.model
+    # def default_get(self, fields):
+    #     res = super(ContactsInherit, self).default_get(fields)
+    #     if self._context.get('path'):
+    #         res['alf_relative_path'] = self._context.get('path')
+    #     return res
 
     @api.model
     def create(self, vals):
