@@ -699,7 +699,7 @@ class ContactsInherit(models.Model):
 
     notebook_ids = fields.One2many('alf.ui.functionality', 'contacts_id', string="Documents List")
     is_active = fields.Boolean('Folder Created', default=False)
-    relative_path = fields.Char('Path', default='/Odoo/Contacts/')
+    # relative_path = fields.Char('Path', default='/Odoo/Contacts/')
     attachment_count = fields.Integer('Count')
     order_id = fields.Char('Contacts ID')
 
