@@ -696,176 +696,176 @@ class LotInherit(models.Model):
             }
 
 
-class ContactsInherit(models.Model):
-    _inherit = 'res.partner'
-
-    notebook_ids = fields.One2many('alf.ui.functionality', 'contacts_id', string="Documents List")
-    is_active = fields.Boolean('Folder Created', default=False)
-    relative_path = fields.Char('Path', default='/Odoo/Contacts/')
-    attachment_count = fields.Integer('Count')
-    order_id = fields.Char('Contacts ID')
-
-    @api.model
-    def default_get(self, default_field):
-        res = super(ContactsInherit, self).default_get(default_field)
-        if self._context.get('path'):
-            res['alf_relative_path'] = self._context.get('path')
-        return res
-
-    @api.model
-    def create(self, vals):
-        res = super(ContactsInherit, self).create(vals)
-        res.update({'order_id': res.name})
-        return res
-
-    def display_count_attachment(self):
-        pass
-
-    def save_document_content(self):
-
-        ticket = self.env['alfresco.operations'].search([], limit=1)
-        ticket.get_auth_token_header()
-
-        folder = self.env['folder.details'].search([('name', '=', self.order_id)])
-
-        get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
-            folder.folder_id) + '/children'
-
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic' " " + str(ticket.alf_encoded_ticket)
-        }
-
-        response = requests.get(get_file_url, headers=headers)
-        if response.status_code == 200:
-            response_data = json.loads(response.text)
-            self.attachment_count = response_data['list']['pagination']['count']
-
-            result = self._cr.execute('delete from alf_ui_functionality')
-
-            if response_data['list']['pagination']['count'] >= 1:
-                for record in response_data['list']['entries']:
-                    if record['entry']['name']:
-                        name = record['entry']['name']
-                        doc_id = record['entry']['id']
-                        document_vals = [(0, 0, {
-                            'order_id': self.id,
-                            'document_name': name,
-                            'document_id': doc_id
-                        })]
-                        existing = self.notebook_ids.search([('document_id', '=', doc_id),
-                                                             ('document_name', '=', name)])
-                        if existing:
-                            existing.write({
-                                'document_name': name,
-                                'document_id': doc_id
-                            })
-                        else:
-                            self.update({'notebook_ids': document_vals})
-                            self._cr.commit()
-                wiz_ob = self.env['pop.auth'].create(
-                    {'pop_up': 'Files Exported Successfully.'})
-                return {
-                    'name': _('Refresh Repository'),
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'pop.auth',
-                    'res_id': wiz_ob.id,
-                    'view_id': False,
-                    'target': 'new',
-                    'views': False,
-                    'type': 'ir.actions.act_window',
-                }
-            else:
-                wiz_ob = self.env['pop.auth'].create(
-                    {'pop_up': 'Folder does not contains any files.'})
-                return {
-                    'name': _('Refresh Repository'),
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'pop.auth',
-                    'res_id': wiz_ob.id,
-                    'view_id': False,
-                    'target': 'new',
-                    'views': False,
-                    'type': 'ir.actions.act_window',
-                }
-
-    def create_folders(self):
-        """This function is to create folder inside folder inside root folder into root directory."""
-
-        res = self.env['res.partner'].search([('id', '=', self.id)])
-        res.write({'order_id': res.name})
-
-        ticket = self.env['alfresco.operations'].search([], limit=1)
-        ticket.get_auth_token_header()
-
-        if ticket.alf_encoded_ticket:
-            pass
-        else:
-            raise ValidationError(_("Please Login!!!"))
-
-        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
-
-        datas = {
-            "name": "",
-            "nodeType": "cm:folder",
-            "relativePath": "/Odoo/Contacts/",
-        }
-
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
-        }
-
-        if not datas['name']:
-            datas.update({'name': 'Odoo', 'relativePath': ''})
-        response = requests.post(base_url, data=json.dumps(datas), headers=headers)
-        if response.status_code == 201 or response.status_code == 409:
-            if datas['name'] == 'Odoo':
-                datas.update({'name': 'Contacts', 'relativePath': '/Odoo'})
-                response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
-                if response_1.status_code == 201 or response_1.status_code == 409:
-                    if datas['name'] == 'Contacts':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Contacts'})
-                        response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
-                        if response_2.status_code == 201:
-                            data_response_2 = json.loads(response_2.text)
-                            self.env['folder.details'].create({'name': data_response_2['entry']['name'],
-                                                               'folder_id': data_response_2['entry']['id']})
-                            if self.is_active is False:
-                                self.update({'is_active': True})
-                        elif response_2.status_code != 201:
-                            raise ValidationError(_('Folder name should not contain special characters.'))
-
-            # This Wizard is use to display the information which we are getting in Response.
-
-            wiz_ob = self.env['pop.folder'].create(
-                {'pop_up': "Folder Created"})
-            return {
-                'name': _('Create Folder'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.folder',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
-        else:
-            wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
-            return {
-                'name': _('Create Folder'),
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'pop.folder',
-                'res_id': wiz_ob.id,
-                'view_id': False,
-                'target': 'new',
-                'views': False,
-                'type': 'ir.actions.act_window',
-            }
+# class ContactsInherit(models.Model):
+#     _inherit = 'res.partner'
+#
+#     notebook_ids = fields.One2many('alf.ui.functionality', 'contacts_id', string="Documents List")
+#     is_active = fields.Boolean('Folder Created', default=False)
+#     relative_path = fields.Char('Path', default='/Odoo/Contacts/')
+#     attachment_count = fields.Integer('Count')
+#     order_id = fields.Char('Contacts ID')
+#
+#     @api.model
+#     def default_get(self, default_field):
+#         res = super(ContactsInherit, self).default_get(default_field)
+#         if self._context.get('path'):
+#             res['alf_relative_path'] = self._context.get('path')
+#         return res
+#
+#     @api.model
+#     def create(self, vals):
+#         res = super(ContactsInherit, self).create(vals)
+#         res.update({'order_id': res.name})
+#         return res
+#
+#     def display_count_attachment(self):
+#         pass
+#
+#     def save_document_content(self):
+#
+#         ticket = self.env['alfresco.operations'].search([], limit=1)
+#         ticket.get_auth_token_header()
+#
+#         folder = self.env['folder.details'].search([('name', '=', self.order_id)])
+#
+#         get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+#             folder.folder_id) + '/children'
+#
+#         headers = {
+#             'Content-Type': 'application/json',
+#             'Authorization': 'Basic' " " + str(ticket.alf_encoded_ticket)
+#         }
+#
+#         response = requests.get(get_file_url, headers=headers)
+#         if response.status_code == 200:
+#             response_data = json.loads(response.text)
+#             self.attachment_count = response_data['list']['pagination']['count']
+#
+#             result = self._cr.execute('delete from alf_ui_functionality')
+#
+#             if response_data['list']['pagination']['count'] >= 1:
+#                 for record in response_data['list']['entries']:
+#                     if record['entry']['name']:
+#                         name = record['entry']['name']
+#                         doc_id = record['entry']['id']
+#                         document_vals = [(0, 0, {
+#                             'order_id': self.id,
+#                             'document_name': name,
+#                             'document_id': doc_id
+#                         })]
+#                         existing = self.notebook_ids.search([('document_id', '=', doc_id),
+#                                                              ('document_name', '=', name)])
+#                         if existing:
+#                             existing.write({
+#                                 'document_name': name,
+#                                 'document_id': doc_id
+#                             })
+#                         else:
+#                             self.update({'notebook_ids': document_vals})
+#                             self._cr.commit()
+#                 wiz_ob = self.env['pop.auth'].create(
+#                     {'pop_up': 'Files Exported Successfully.'})
+#                 return {
+#                     'name': _('Refresh Repository'),
+#                     'view_type': 'form',
+#                     'view_mode': 'form',
+#                     'res_model': 'pop.auth',
+#                     'res_id': wiz_ob.id,
+#                     'view_id': False,
+#                     'target': 'new',
+#                     'views': False,
+#                     'type': 'ir.actions.act_window',
+#                 }
+#             else:
+#                 wiz_ob = self.env['pop.auth'].create(
+#                     {'pop_up': 'Folder does not contains any files.'})
+#                 return {
+#                     'name': _('Refresh Repository'),
+#                     'view_type': 'form',
+#                     'view_mode': 'form',
+#                     'res_model': 'pop.auth',
+#                     'res_id': wiz_ob.id,
+#                     'view_id': False,
+#                     'target': 'new',
+#                     'views': False,
+#                     'type': 'ir.actions.act_window',
+#                 }
+#
+#     def create_folders(self):
+#         """This function is to create folder inside folder inside root folder into root directory."""
+#
+#         res = self.env['res.partner'].search([('id', '=', self.id)])
+#         res.write({'order_id': res.name})
+#
+#         ticket = self.env['alfresco.operations'].search([], limit=1)
+#         ticket.get_auth_token_header()
+#
+#         if ticket.alf_encoded_ticket:
+#             pass
+#         else:
+#             raise ValidationError(_("Please Login!!!"))
+#
+#         base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children'
+#
+#         datas = {
+#             "name": "",
+#             "nodeType": "cm:folder",
+#             "relativePath": "/Odoo/Contacts/",
+#         }
+#
+#         headers = {
+#             'Content-Type': 'application/json',
+#             'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
+#         }
+#
+#         if not datas['name']:
+#             datas.update({'name': 'Odoo', 'relativePath': ''})
+#         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
+#         if response.status_code == 201 or response.status_code == 409:
+#             if datas['name'] == 'Odoo':
+#                 datas.update({'name': 'Contacts', 'relativePath': '/Odoo'})
+#                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
+#                 if response_1.status_code == 201 or response_1.status_code == 409:
+#                     if datas['name'] == 'Contacts':
+#                         datas.update({'name': str(self.name), 'relativePath': '/Odoo/Contacts'})
+#                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
+#                         if response_2.status_code == 201:
+#                             data_response_2 = json.loads(response_2.text)
+#                             self.env['folder.details'].create({'name': data_response_2['entry']['name'],
+#                                                                'folder_id': data_response_2['entry']['id']})
+#                             if self.is_active is False:
+#                                 self.update({'is_active': True})
+#                         elif response_2.status_code != 201:
+#                             raise ValidationError(_('Folder name should not contain special characters.'))
+#
+#             # This Wizard is use to display the information which we are getting in Response.
+#
+#             wiz_ob = self.env['pop.folder'].create(
+#                 {'pop_up': "Folder Created"})
+#             return {
+#                 'name': _('Create Folder'),
+#                 'view_type': 'form',
+#                 'view_mode': 'form',
+#                 'res_model': 'pop.folder',
+#                 'res_id': wiz_ob.id,
+#                 'view_id': False,
+#                 'target': 'new',
+#                 'views': False,
+#                 'type': 'ir.actions.act_window',
+#             }
+#         else:
+#             wiz_ob = self.env['pop.folder'].create({'pop_up': "Please check your request and try again!"})
+#             return {
+#                 'name': _('Create Folder'),
+#                 'view_type': 'form',
+#                 'view_mode': 'form',
+#                 'res_model': 'pop.folder',
+#                 'res_id': wiz_ob.id,
+#                 'view_id': False,
+#                 'target': 'new',
+#                 'views': False,
+#                 'type': 'ir.actions.act_window',
+#             }
 
 
 class MaintenanceInherit(models.Model):
