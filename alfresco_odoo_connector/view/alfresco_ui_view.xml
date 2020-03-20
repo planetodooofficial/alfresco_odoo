@@ -253,7 +253,7 @@
                     <field name="attachment_count" widget="statinfo" string="Attachments"/>
                 </button>
             </xpath>
-            <xpath expr="//form/sheet" position="inside">
+            <xpath expr="//form//sheet" position="inside">
                 <notebook>
                     <page string="Documents" groups="base.group_user">
                         <group>
@@ -291,7 +291,7 @@
         </field>
     </record>
 
-    <record id="maintenance_document_alfresco" model="ir.ui.view">
+    <record id="equipment_document_alfresco" model="ir.ui.view">
         <field name="name">MAINTENANCE EQUIPMENTS - Documents For Alfresco</field>
         <field name="model">maintenance.equipment</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
@@ -318,9 +318,9 @@
                     </group>
                     <group>
                         <group>
-                            <field name="order_id" invisible="0"/>
-                            <field name="is_active" invisible="0"/>
-                            <field name="relative_path" invisible="0"/>
+                            <field name="order_id" invisible="1"/>
+                            <field name="is_active" invisible="1"/>
+                            <field name="relative_path" invisible="1"/>
                         </group>
                     </group>
                     <field name="notebook_ids" widget="one2many" readonly="1">
