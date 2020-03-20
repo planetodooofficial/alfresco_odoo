@@ -387,51 +387,51 @@
 
     <!-- CONTACTS   -->
 
-    <record id="contact_task_document_alfresco" model="ir.ui.view">
-        <field name="name">CONTACTS - Documents For Alfresco</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//sheet/div[@name='button_box']" position="inside">
-                <button name="display_count_attachment" type="object" class="oe_stat_button" icon="fa-paperclip">
-                    <field name="attachment_count" widget="statinfo" string="Attachments"/>
-                </button>
-            </xpath>
-            <notebook position="inside">
-                <page string="Documents" groups="base.group_user">
-                    <group>
-                        <div>
-                            <button name="save_document_content"  class="btn btn-light"
-                                    icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>
-                            <button name="create_folders" class="btn btn-light"
-                                    icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"
-                                    attrs="{'invisible': [('is_active', '=', True)]}"/>
-                            <button name="%(alfresco_odoo_connector.action_files)d"
-                                    context="{'path': relative_path, 'sale_id': order_id}"
-                                    class="btn btn-light"
-                                    icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>
-                        </div>
-                    </group>
-                    <group>
-                        <group>
-                            <field name="order_id" invisible="1"/>
-                            <field name="is_active" invisible="1"/>
-                            <field name="relative_path" invisible="1"/>
-                        </group>
-                    </group>
-                    <field name="notebook_ids" widget="one2many" readonly="1">
-                        <tree string="Details" editable="bottom" create="0" delete="0">
-                            <field name="document_name"/>
-                            <button name="delete_files"
-                                    icon="fa-trash" type="object" groups="base.group_user"/>
-                            <button name="download_files"
-                                    icon="fa-download" type="object" groups="base.group_user"/>
-                        </tree>
-                    </field>
-                </page>
-            </notebook>
-        </field>
-    </record>
+<!--    <record id="contact_task_document_alfresco" model="ir.ui.view">-->
+<!--        <field name="name">CONTACTS - Documents For Alfresco</field>-->
+<!--        <field name="model">res.partner</field>-->
+<!--        <field name="inherit_id" ref="base.view_partner_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//sheet/div[@name='button_box']" position="inside">-->
+<!--                <button name="display_count_attachment" type="object" class="oe_stat_button" icon="fa-paperclip">-->
+<!--                    <field name="attachment_count" widget="statinfo" string="Attachments"/>-->
+<!--                </button>-->
+<!--            </xpath>-->
+<!--            <notebook position="inside">-->
+<!--                <page string="Documents" groups="base.group_user">-->
+<!--                    <group>-->
+<!--                        <div>-->
+<!--                            <button name="save_document_content"  class="btn btn-light"-->
+<!--                                    icon="fa-refresh" type="object" groups="base.group_user" help="Refresh Repository"/>-->
+<!--                            <button name="create_folders" class="btn btn-light"-->
+<!--                                    icon="fa-folder" type="object" groups="base.group_user" help="Create Folder"-->
+<!--                                    attrs="{'invisible': [('is_active', '=', True)]}"/>-->
+<!--                            <button name="%(alfresco_odoo_connector.action_files)d"-->
+<!--                                    context="{'path': relative_path, 'sale_id': order_id}"-->
+<!--                                    class="btn btn-light"-->
+<!--                                    icon="fa-file-text" type="action" groups="base.group_user" help="Import Files"/>-->
+<!--                        </div>-->
+<!--                    </group>-->
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="order_id" invisible="1"/>-->
+<!--                            <field name="is_active" invisible="1"/>-->
+<!--                            <field name="relative_path" invisible="1"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+<!--                    <field name="notebook_ids" widget="one2many" readonly="1">-->
+<!--                        <tree string="Details" editable="bottom" create="0" delete="0">-->
+<!--                            <field name="document_name"/>-->
+<!--                            <button name="delete_files"-->
+<!--                                    icon="fa-trash" type="object" groups="base.group_user"/>-->
+<!--                            <button name="download_files"-->
+<!--                                    icon="fa-download" type="object" groups="base.group_user"/>-->
+<!--                        </tree>-->
+<!--                    </field>-->
+<!--                </page>-->
+<!--            </notebook>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <!-- EMPLOYEE   -->
 
