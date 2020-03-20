@@ -387,7 +387,7 @@
 
     <!-- CONTACTS   -->
 
-    <record id="contacts_task_document_alfresco" model="ir.ui.view">
+    <record id="contact_task_document_alfresco" model="ir.ui.view">
         <field name="name">CONTACTS - Documents For Alfresco</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
@@ -414,9 +414,9 @@
                     </group>
                     <group>
                         <group>
-<!--                            <field name="order_id" invisible="1"/>-->
-<!--                            <field name="is_active" invisible="1"/>-->
-<!--                            <field name="relative_path" invisible="1"/>-->
+                            <field name="order_id" invisible="1"/>
+                            <field name="is_active" invisible="1"/>
+                            <field name="relative_path" invisible="1"/>
                         </group>
                     </group>
                     <field name="notebook_ids" widget="one2many" readonly="1">
