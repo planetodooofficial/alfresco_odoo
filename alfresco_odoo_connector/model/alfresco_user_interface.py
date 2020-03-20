@@ -954,6 +954,102 @@ class EquipmentInherit(models.Model):
                     'type': 'ir.actions.act_window',
                 }
 
+
+class ProjectTaskInherit(models.Model):
+    _inherit = 'project.task'
+
+    notebook_ids = fields.One2many('alf.ui.functionality', 'project_id', string="Documents List")
+    is_active = fields.Boolean('Folder Created', default=False)
+    relative_path = fields.Char('Path', default='/Odoo/Project Task/')
+    attachment_count = fields.Integer('Count')
+    order_id = fields.Char('Project Task ID')
+
+    @api.model
+    def default_get(self, default_field):
+        res = super(ProjectTaskInherit, self).default_get(default_field)
+        if self._context.get('path'):
+            res['alf_relative_path'] = self._context.get('path')
+        return res
+
+    @api.model
+    def create(self, vals):
+        res = super(ProjectTaskInherit, self).create(vals)
+        res.update({'order_id': res.name})
+        return res
+
+    def display_count_attachment(self):
+        pass
+
+    def save_document_content(self):
+
+        ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
+
+        folder = self.env['folder.details'].search([('name', '=', self.order_id)])
+
+        get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
+            folder.folder_id) + '/children'
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic' " " + str(ticket.alf_encoded_ticket)
+        }
+
+        response = requests.get(get_file_url, headers=headers)
+        if response.status_code == 200:
+            response_data = json.loads(response.text)
+            self.attachment_count = response_data['list']['pagination']['count']
+
+            result = self._cr.execute('delete from alf_ui_functionality')
+
+            if response_data['list']['pagination']['count'] >= 1:
+                for record in response_data['list']['entries']:
+                    if record['entry']['name']:
+                        name = record['entry']['name']
+                        doc_id = record['entry']['id']
+                        document_vals = [(0, 0, {
+                            'order_id': self.id,
+                            'document_name': name,
+                            'document_id': doc_id
+                        })]
+                        existing = self.notebook_ids.search([('document_id', '=', doc_id),
+                                                             ('document_name', '=', name)])
+                        if existing:
+                            existing.write({
+                                'document_name': name,
+                                'document_id': doc_id
+                            })
+                        else:
+                            self.update({'notebook_ids': document_vals})
+                            self._cr.commit()
+                wiz_ob = self.env['pop.auth'].create(
+                    {'pop_up': 'Files Exported Successfully.'})
+                return {
+                    'name': _('Refresh Repository'),
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'pop.auth',
+                    'res_id': wiz_ob.id,
+                    'view_id': False,
+                    'target': 'new',
+                    'views': False,
+                    'type': 'ir.actions.act_window',
+                }
+            else:
+                wiz_ob = self.env['pop.auth'].create(
+                    {'pop_up': 'Folder does not contains any files.'})
+                return {
+                    'name': _('Refresh Repository'),
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'pop.auth',
+                    'res_id': wiz_ob.id,
+                    'view_id': False,
+                    'target': 'new',
+                    'views': False,
+                    'type': 'ir.actions.act_window',
+                }
+
     def create_folders(self):
         """This function is to create folder inside folder inside root folder into root directory."""
 
@@ -970,7 +1066,7 @@ class EquipmentInherit(models.Model):
         datas = {
             "name": "",
             "nodeType": "cm:folder",
-            "relativePath": "/Odoo/Equipment/",
+            "relativePath": "/Odoo/Project Task/",
         }
 
         headers = {
@@ -983,11 +1079,11 @@ class EquipmentInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Equipment', 'relativePath': '/Odoo'})
+                datas.update({'name': 'Project Task', 'relativePath': '/Odoo'})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
-                    if datas['name'] == 'Equipment':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Equipment'})
+                    if datas['name'] == 'Project Task':
+                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Project Task'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -1037,6 +1133,7 @@ class AlfrescoUIFunctionality(models.Model):
     stock_lot_id = fields.Many2one('stock.production.lot', string='ID')
     maintenance_id = fields.Many2one('maintenance.request', string='ID')
     equipment_id = fields.Many2one('maintenance.equipment', string='ID')
+    project_id = fields.Many2one('project.task', string='ID')
     document_name = fields.Char("Doc Name")
     document_id = fields.Char("Doc ID")
 
@@ -1050,6 +1147,7 @@ class AlfrescoUIFunctionality(models.Model):
         call = self.env['stock.production.lot'].search([], limit=1)
         call = self.env['maintenance.request'].search([], limit=1)
         call = self.env['maintenance.equipment'].search([], limit=1)
+        call = self.env['project.task'].search([], limit=1)
 
         headers = {
             'Content-Type': 'application/json',
