@@ -49,7 +49,9 @@
 
     <menuitem id="alf_operations"
               name="Alfresco"
-              groups="base.group_user"/>
+              groups="base.group_user"
+              web_icon="alfresco_odoo_connector/static/description/icon.png"
+    />
 
     <menuitem id="alf_auth_ticket_id"
               parent="alf_operations"
