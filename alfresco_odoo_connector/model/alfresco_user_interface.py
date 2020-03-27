@@ -829,7 +829,7 @@ class ContactsInherit(models.Model):
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Contacts':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Contacts'})
+                        datas.update({'name': str(self.parent_id + '/' + self.name), 'relativePath': '/Odoo/Contacts'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
