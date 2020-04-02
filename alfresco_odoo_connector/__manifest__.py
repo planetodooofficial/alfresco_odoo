@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Alfresco',
+    'name': 'ALFRESCO - ODOO CONNECTOR',
     'version': '1.0.0',
     'summary': 'Alfresco connection with Odoo',
-    'category': 'API',
+    'category': 'Extra Tools',
     'author': 'Planet-Odoo',
     'maintainer': 'Planet-Odoo',
     'company': 'Planet-Odoo',
-    'website': '',
+    'website': 'http://www.planet-odoo.com/',
     'depends': ['base', 'purchase', 'sale', 'contacts', 'crm', 'stock', 'account', 'project', 'maintenance', 'hr'],
     'data': [
         'security/ir.model.access.csv',
@@ -19,6 +19,11 @@
     ],
     'images': [],
     'license': 'AGPL-3',
+    'price': "500",
+    'currency': "EUR",
+    'qweb': ['static/src/xml/*.xml'],
+    'js': ['static/src/js/*.js'],
+    'images': ["static/description/planeicon.png"],
     'installable': True,
     'application': False,
     'auto_install': False,
