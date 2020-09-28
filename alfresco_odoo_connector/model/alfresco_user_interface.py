@@ -727,8 +727,14 @@ class ContactsInherit(models.Model):
 
         ticket = self.env['alfresco.operations'].search([], limit=1)
         ticket.get_auth_token_header()
+        folder_name = ''
 
-        folder = self.env['folder.details'].search([('name', '=', self.order_id)])
+        if self.parent_id.name:
+            folder_name = str(self.parent_id.name + '-' + self.order_id)
+        else:
+            folder_name = str(self.order_id)
+
+        folder = self.env['folder.details'].search([('name', '=', folder_name)])
 
         get_file_url = str(ticket.alf_base_url) + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/' + str(
             folder.folder_id) + '/children'
@@ -829,7 +835,16 @@ class ContactsInherit(models.Model):
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Contacts':
-                        datas.update({'name': str(self.parent_id.name) + '-' + str(self.name), 'relativePath': '/Odoo/Contacts'})
+                        if self.parent_id.name:
+                            datas.update({
+                                'name': str(self.parent_id.name) + '-' + str(self.name),
+                                'relativePath': '/Odoo/Contacts'
+                            })
+                        else:
+                            datas.update({
+                                'name': str(self.name),
+                                'relativePath': '/Odoo/Contacts'
+                            })
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
