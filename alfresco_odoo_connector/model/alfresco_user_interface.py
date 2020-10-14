@@ -102,7 +102,7 @@ class SaleOrderInherit(models.Model):
                 }
 
     def create_folders(self):
-        """This function is to create folder inside folder inside root folder into root directory."""
+        """This function is to create folder, inside folder, inside root folder, into root directory."""
 
         res = self.env['sale.order'].search([('id', '=', self.id)])
         res.write({'order_id': res.name})
@@ -133,11 +133,15 @@ class SaleOrderInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Sales Order', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Sales Order', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Sales Order':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Sales Order'})
+                        datas.update(
+                            {'name': str(self.name), 'relativePath': '/Odoo/' + self.env.cr.dbname + '/Sales Order'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -305,11 +309,15 @@ class PurchaseOrderInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Purchase Order', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Purchase Order', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Purchase Order':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Purchase Order'})
+                        datas.update(
+                            {'name': str(self.name), 'relativePath': '/Odoo/' + self.env.cr.dbname + '/Purchase Order'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -481,11 +489,15 @@ class InvoiceInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Invoices & Bills', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Invoices & Bills', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Invoices & Bills':
-                        datas.update({'name': str(self.order_id), 'relativePath': '/Odoo/Invoices & Bills'})
+                        datas.update({'name': str(self.order_id),
+                                      'relativePath': '/Odoo/' + self.env.cr.dbname + '/Invoices & Bills'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -653,11 +665,15 @@ class LotInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Stock Production Lot', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Stock Production Lot', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Stock Production Lot':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Stock Production Lot'})
+                        datas.update({'name': str(self.name),
+                                      'relativePath': '/Odoo/' + self.env.cr.dbname + '/Stock Production Lot'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -831,19 +847,22 @@ class ContactsInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Contacts', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Contacts', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Contacts':
                         if self.parent_id.name:
                             datas.update({
                                 'name': str(self.parent_id.name) + '-' + str(self.name),
-                                'relativePath': '/Odoo/Contacts'
+                                'relativePath': '/Odoo/' + self.env.cr.dbname + '/Contacts'
                             })
                         else:
                             datas.update({
                                 'name': str(self.name),
-                                'relativePath': '/Odoo/Contacts'
+                                'relativePath': '/Odoo/' + self.env.cr.dbname + '/Contacts'
                             })
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
@@ -1012,11 +1031,15 @@ class MaintenanceInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Maintenance', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Maintenance', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Maintenance':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Maintenance'})
+                        datas.update(
+                            {'name': str(self.name), 'relativePath': '/Odoo/' + self.env.cr.dbname + '/Maintenance'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -1184,11 +1207,15 @@ class EquipmentInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Equipment', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Equipment', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Equipment':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Equipment'})
+                        datas.update(
+                            {'name': str(self.name), 'relativePath': '/Odoo/' + self.env.cr.dbname + '/Equipment'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -1356,11 +1383,15 @@ class ProjectTaskInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Project Task', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Project Task', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Project Task':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Project Task'})
+                        datas.update(
+                            {'name': str(self.name), 'relativePath': '/Odoo/' + self.env.cr.dbname + '/Project Task'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
@@ -1528,11 +1559,15 @@ class EmployeeInherit(models.Model):
         response = requests.post(base_url, data=json.dumps(datas), headers=headers)
         if response.status_code == 201 or response.status_code == 409:
             if datas['name'] == 'Odoo':
-                datas.update({'name': 'Employee', 'relativePath': '/Odoo'})
+                datas.update({'name': self.env.cr.dbname, 'relativePath': '/Odoo'})
+                response_db = requests.post(base_url, data=json.dumps(datas), headers=headers)
+                if response_db.status_code == 201 or response_db.status_code == 409:
+                    datas.update({'name': 'Employee', 'relativePath': '/Odoo/' + self.env.cr.dbname})
                 response_1 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                 if response_1.status_code == 201 or response_1.status_code == 409:
                     if datas['name'] == 'Employee':
-                        datas.update({'name': str(self.name), 'relativePath': '/Odoo/Employee'})
+                        datas.update(
+                            {'name': str(self.name), 'relativePath': '/Odoo/' + self.env.cr.dbname + '/Employee'})
                         response_2 = requests.post(base_url, data=json.dumps(datas), headers=headers)
                         if response_2.status_code == 201:
                             data_response_2 = json.loads(response_2.text)
