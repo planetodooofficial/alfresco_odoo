@@ -42,6 +42,12 @@ class Manage_Files_Folders(models.TransientModel):
         res = super(Manage_Files_Folders, self).default_get(default_field)
         if self._context.get('path'):
             res['alf_relative_path'] = self._context.get('path')
+            text = str(res['alf_relative_path'])
+            t = text.split("/")
+            new_path = '/' + t[1] + '/' + self.env.cr.dbname + '/' + t[2] + '/'
+            res.update({
+                'alf_relative_path': str(new_path)
+            })
         if self._context.get('sale_id'):
             res['alf_folder_path'] = self._context.get('sale_id')
         return res
