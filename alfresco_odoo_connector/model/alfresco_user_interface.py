@@ -359,9 +359,9 @@ class PurchaseOrderInherit(models.Model):
 
 
 class InvoiceInherit(models.Model):
-    _inherit = 'account.invoice'
+    _inherit = 'account.move'
 
-    notebook_ids = fields.One2many('alf.ui.functionality', 'invoice_id', string="Documents List")
+    notebook_ids = fields.One2many('alf.ui.functionality', 'move_id', string="Documents List")
     is_active = fields.Boolean('Folder Created', default=False)
     relative_path = fields.Char('Path', default='/Odoo/Invoices & Bills/')
     attachment_count = fields.Integer('Count')
@@ -458,7 +458,7 @@ class InvoiceInherit(models.Model):
     def create_folders(self):
         """This function is to create folder inside folder inside root folder into root directory."""
 
-        res = self.env['account.invoice'].search([('id', '=', self.id)])
+        res = self.env['account.move'].search([('id', '=', self.id)])
         x = res.number
         name = x.replace("/", " ")
         res.write({'order_id': name})
@@ -1485,7 +1485,7 @@ class EmployeeInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -1613,7 +1613,7 @@ class AlfrescoUIFunctionality(models.Model):
 
     sale_id = fields.Many2one('sale.order', string="ID")
     purchase_id = fields.Many2one('purchase.order', string="ID")
-    invoice_id = fields.Many2one('account.invoice', string='IDs')
+    move_id = fields.Many2one('account.move', string='IDs')
     stock_lot_id = fields.Many2one('stock.production.lot', string='ID')
     maintenance_id = fields.Many2one('maintenance.request', string='ID')
     equipment_id = fields.Many2one('maintenance.equipment', string='ID')
@@ -1629,7 +1629,7 @@ class AlfrescoUIFunctionality(models.Model):
 
         call = self.env['sale.order'].search([], limit=1)
         call = self.env['purchase.order'].search([], limit=1)
-        call = self.env['account.invoice'].search([], limit=1)
+        call = self.env['account.move'].search([], limit=1)
         call = self.env['stock.production.lot'].search([], limit=1)
         call = self.env['maintenance.request'].search([], limit=1)
         call = self.env['maintenance.equipment'].search([], limit=1)
