@@ -101,8 +101,8 @@
 
     <record id="account_inv_document_alfresco" model="ir.ui.view">
         <field name="name">Account Invoices  - Documents For Alfresco</field>
-        <field name="model">account.invoice</field>
-        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet/div[@name='button_box']" position="inside">
                 <button name="display_count_attachment" type="object" class="oe_stat_button" icon="fa-paperclip">
@@ -147,8 +147,8 @@
 
     <record id="account_bills_document_alfresco" model="ir.ui.view">
         <field name="name">Vendor Bills  - Documents For Alfresco</field>
-        <field name="model">account.invoice</field>
-        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Documents" attrs="{'invisible': [('state', '!=', 'open')]}" groups="base.group_user">

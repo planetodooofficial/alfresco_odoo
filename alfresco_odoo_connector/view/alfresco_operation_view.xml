@@ -4,8 +4,7 @@
 
     <record id="alfresco_operations_id" model="ir.actions.act_window">
         <field name="name">Operations</field>
-        <field name="res_model">alfresco.operations</field>
-        <field name="view_type">form</field>
+        <field name="res_model">alfresco.operations</field>        
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">Authentication with the Repository</p>
