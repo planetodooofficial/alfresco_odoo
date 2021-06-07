@@ -59,7 +59,7 @@ class SaleOrderInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -235,7 +235,7 @@ class PurchaseOrderInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -413,7 +413,7 @@ class InvoiceInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -591,7 +591,7 @@ class LotInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -773,7 +773,7 @@ class ContactsInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -957,7 +957,7 @@ class MaintenanceInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -1133,7 +1133,7 @@ class EquipmentInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -1309,7 +1309,7 @@ class ProjectTaskInherit(models.Model):
                         name = record['entry']['name']
                         doc_id = record['entry']['id']
                         document_vals = [(0, 0, {
-                            'order_id': self.id,
+                            'order_id': self.order_id,
                             'document_name': name,
                             'document_id': doc_id
                         })]
@@ -1622,6 +1622,7 @@ class AlfrescoUIFunctionality(models.Model):
     employee_id = fields.Many2one('hr.employee', string='ID')
     document_name = fields.Char("Doc Name")
     document_id = fields.Char("Doc ID")
+    order_id = fields.Char("Order ID")
 
     def delete_files(self):
         ticket = self.env['alfresco.operations'].search([], limit=1)
