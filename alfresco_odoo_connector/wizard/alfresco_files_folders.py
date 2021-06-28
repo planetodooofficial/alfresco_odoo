@@ -18,7 +18,7 @@ class Folder(models.Model):
 
 class Manage_Files_Folders(models.TransientModel):
     """This class contains all the functionality for managing files &
-    folder in the Alfresco Repository"""
+	folder in the Alfresco Repository"""
 
     _name = 'alfresco.files.folder'
     _rec_name = 'alf_folder_name'
@@ -258,58 +258,60 @@ class Manage_Files_Folders(models.TransientModel):
                     'views': False,
                     'type': 'ir.actions.act_window',
                 }
-            # wiz_ob = self.env['pop.list.content'].create({'popup_list_content': 'Folder List Updated Successfully!'})
-            # return {
-            #     'name': _('Alert'),
-            #     'view_type': 'form',
-            #     'view_mode': 'form',
-            #     'res_model': 'pop.list.content',
-            #     'res_id': wiz_ob.id,
-            #     'view_id': False,
-            #     'target': 'new',
-            #     'views': False,
-            #     'type': 'ir.actions.act_window',
-            # }
+        wiz_ob = self.env['pop.list.content'].create(
+            {'popup_list_content': "Folder List Updated Successfully!"})
+        return {
+            'name': _('Alert'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'pop.list.content',
+            'res_id': wiz_ob.id,
+            'view_id': False,
+            'target': 'new',
+            'views': False,
+            'type': 'ir.actions.act_window',
+        }
 
-    # def filter_contents_of_folder(self):
-    #     """This function will list the contents of a folder in the repository"""
-    #
-    #     ticket = self.env['alfresco.operations'].search([], limit=1)
-    #     ticket.get_auth_token_header()
+    def filter_contents_of_folder(self):
+        """This function will list the contents of a folder in the repository"""
 
-    # if ticket.alf_encoded_ticket:
-    #     pass
-    # else:
-    #     raise ValidationError(_("Please Login!!!"))
-    #
-    #     base_url = ticket.alf_base_url + "alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
-    #
-    #     headers = {
-    #         'Accept': 'application/json',
-    #         'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
-    #     }
-    #
-    #     response = requests.get(base_url, headers=headers)
+        ticket = self.env['alfresco.operations'].search([], limit=1)
+        ticket.get_auth_token_header()
 
-    # def get_folder_file_metadata(self):
-    #     """Getting the metadata for a node returns the properties for the node type and applied aspects."""
-    #
-    #     ticket = self.env['alfresco.operations'].search([], limit=1)
-    #     ticket.get_auth_token_header()
-    # if ticket.alf_encoded_ticket:
-    #     pass
-    # else:
-    #     raise ValidationError(_("Please Login!!!"))
-    #
-    #     base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
-    #
-    #     headers = {
-    #         'Accept': 'application/json',
-    #         'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
-    #     }
-    #
-    #     response = requests.get(base_url, headers=headers)
-    #     print(json.loads(response.text))
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
+        base_url = ticket.alf_base_url + "alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-/children?relativePath=Test&orderBy=name%20DESC"
+
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': 'Basic' + " " + ticket.alf_encoded_ticket
+        }
+
+        response = requests.get(base_url, headers=headers)
+
+    def get_folder_file_metadata(self):
+        """Getting the metadata for a node returns the properties for the node type and applied aspects."""
+
+        ticket = self.env['alfresco.operations'].search([], limit=1)
+
+        ticket.get_auth_token_header()
+        if ticket.alf_encoded_ticket:
+            pass
+        else:
+            raise ValidationError(_("Please Login!!!"))
+
+        base_url = ticket.alf_base_url + 'alfresco/api/-default-/public/alfresco/versions/1/nodes/-root-'
+
+        headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Basic' + " " + str(ticket.alf_encoded_ticket)
+        }
+
+        response = requests.get(base_url, headers=headers)
+        print(json.loads(response.text))
 
     def upload_file(self):
         """Uploading a file to the Repository means creating a node with metadata and content."""

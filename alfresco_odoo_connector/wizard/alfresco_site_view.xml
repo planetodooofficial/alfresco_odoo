@@ -26,8 +26,7 @@
         <record id="action_manage_sites" model="ir.actions.act_window">
             <field name="name">Create Alfresco Share Site</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">manage.sites</field>
-            <field name="view_type">form</field>
+            <field name="res_model">manage.sites</field>            
             <field name="view_mode">form</field>
             <field name="view_id" ref="sites_form_id"/>
             <field name="target">new</field>
@@ -62,8 +61,7 @@
         <record id="action_update_sites" model="ir.actions.act_window">
             <field name="name">Update Alfresco Share Site</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">manage.sites</field>
-            <field name="view_type">form</field>
+            <field name="res_model">manage.sites</field>            
             <field name="view_mode">form</field>
             <field name="view_id" ref="sites_update_id"/>
             <field name="target">new</field>
@@ -96,8 +94,7 @@
         <record id="action_add_content_sites" model="ir.actions.act_window">
             <field name="name">Add Content Alfresco Share Site</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">manage.sites</field>
-            <field name="view_type">form</field>
+            <field name="res_model">manage.sites</field>            
             <field name="view_mode">form</field>
             <field name="view_id" ref="sites_content_id"/>
             <field name="target">new</field>
@@ -119,16 +116,16 @@
 
         <!--        Sites Main Menu-->
 
-<!--        <menuitem id="menu_manage_sites" name="Sites" parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>-->
+        <menuitem id="menu_manage_sites" name="Sites" parent="alfresco_odoo_connector.alf_operations" groups="base.group_user"/>
         <!--        Sites Sub Menu to Create Site-->
-<!--        <menuitem id="sub_menu_create_sites" name="Create Sites" action="action_manage_sites"-->
-<!--                  parent="alfresco_odoo_connector.menu_manage_sites" sequence="1"/>-->
+        <menuitem id="sub_menu_create_sites" name="Create Sites" action="action_manage_sites"
+                  parent="alfresco_odoo_connector.menu_manage_sites" sequence="1"/>
         <!--        Sites Sub Menu to Update Site-->
-<!--        <menuitem id="sub_menu_update_sites" name="Update Sites" action="action_update_sites"-->
-<!--                  parent="alfresco_odoo_connector.menu_manage_sites" sequence="2"/>-->
+        <menuitem id="sub_menu_update_sites" name="Update Sites" action="action_update_sites"
+                  parent="alfresco_odoo_connector.menu_manage_sites" sequence="2"/>
         <!--        Sites Sub Menu to Add Content To Site-->
-<!--        <menuitem id="sub_menu_content_to_sites" name="Add Content To Site" action="action_add_content_sites"-->
-<!--                  parent="alfresco_odoo_connector.menu_manage_sites" sequence="3"/>-->
+        <menuitem id="sub_menu_content_to_sites" name="Add Content To Site" action="action_add_content_sites"
+                  parent="alfresco_odoo_connector.menu_manage_sites" sequence="3"/>
 
     </data>
 </odoo>

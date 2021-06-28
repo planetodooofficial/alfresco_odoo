@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'ALFRESCO - ODOO CONNECTOR',
-    'version': '1.0.0',
+    'version': '1.0.1',
     'summary': 'Alfresco connection with Odoo',
     'category': 'Extra Tools',
     'author': 'Planet-Odoo',
@@ -25,6 +25,6 @@
     'js': ['static/src/js/*.js'],
     'images': ["static/description/planeicon.png"],
     'installable': True,
-    'application': False,
+    'application': True,
     'auto_install': False,
 }
